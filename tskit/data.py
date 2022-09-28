@@ -24,8 +24,8 @@ class TimeSeries:
             self.freq = index.step
         self.name = name or str(uuid.uuid4())
 
-    def transform_shapelet(self, alpha: float = 1.0) -> 'TimeSeries':
-        return tskit.transform.transform_shapelet(self, alpha=alpha, inplace=True)
+    def to_shapelet(self, alpha: float = 1.0) -> 'TimeSeries':
+        return tskit.transform.to_shapelet(self, alpha=alpha, inplace=True)
 
     def add_noise(self, method: str = 'gaussian', amplitude: float = 0.1, **kwargs) -> 'TimeSeries':
         match method:
@@ -44,10 +44,10 @@ class TimeSeries:
                 raise ValueError(f'Unknown smoothing method: {method}.')
 
     def standardize(self) -> 'TimeSeries':
-        return tskit.utils.standardize(self, inplace=True)
+        return tskit.transform.standardize(self, inplace=True)
 
-    def repeat(self, n: int) -> 'TimeSeries':
-        return tskit.utils.repeat(self, n=n, inplace=True)
+    def tile(self, n: int) -> 'TimeSeries':
+        return tskit.transform.tile(self, n=n, inplace=True)
 
     def save(self, path: Optional[str] = None, save_format: str = 'csv', **kwargs):
         if path is None:

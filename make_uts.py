@@ -8,12 +8,12 @@ sns.set_style('darkgrid')
 
 ts_mod = tskit.generator.random_walk(start=pd.Timestamp('2022-09-27 00:00:00'), length=1440, freq='1min')
 ts_base = tskit.generator.sin(start=pd.Timestamp('2022-09-27 00:00:00'), length=1440, freq='1min', period=1440)
-ts = tskit.transform.merge(ts_base, ts_mod, modifier_weight=0.5)
+ts = tskit.transform.merge([ts_base, ts_mod], weights=[1.0, 0.5], standardize_idx=[1])
 ts = (
     ts
     .smooth('exponential', alpha=0.5)
-    .transform_shapelet(alpha=5)
-    .repeat(10)
+    .to_shapelet(alpha=5)
+    .tile(10)
     .add_noise('gaussian')
 )
 ts.save('out/uts.csv')
