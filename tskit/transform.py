@@ -11,6 +11,7 @@ def merge(
         ts_array: Sequence[tskit.TimeSeries],
         weights: Optional[Sequence[float]] = None,
         standardize_idx: Optional[Sequence[int]] = None,
+        index: Optional[pd.DatetimeIndex | pd.RangeIndex] = None,
 ) -> tskit.TimeSeries:
     if any([len(ts) != len(ts_array[0]) for ts in ts_array]):
         raise ValueError('All time series must have the same length.')
@@ -20,6 +21,8 @@ def merge(
         weights = [1.0] * len(ts_array)
     if standardize_idx is None:
         standardize_idx = []
+    if index is None:
+        index = ts_array[0].index.copy()
     values = np.zeros(len(ts_array[0]))
     for i, ts in enumerate(ts_array):
         if i in standardize_idx:
@@ -27,7 +30,7 @@ def merge(
         else:
             values += ts.values * weights[i]
     return tskit.TimeSeries(
-        index=ts_array[0].index.copy(),
+        index=index,
         values=values,
         name=f'[{"+".join([ts.name for ts in ts_array])}]',
     )
