@@ -80,7 +80,7 @@ More Examples:
     - [ ] Point-wise outlier
         - [ ] Contextual outlier
         - [ ] Global outlier
-      - [ ] Pattern-wise outlier
+    - [ ] Pattern-wise outlier
         - [ ] Shapelet outlier
         - [ ] Trend outlier
         - [ ] Seasonal outlier
