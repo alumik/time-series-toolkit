@@ -6,6 +6,8 @@
 
 `tskit` is a collection of tools for time series data analysis.
 
+Only univariate time series are supported at the moment.
+
 ## A Quick Example
 
 ```python
@@ -33,10 +35,10 @@ tskit.plot(ts, title=ts.name)
 
 More Examples:
 
-- [time_series_factory.ipynb](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/time_series_factory.ipynb)
-- [generate_uts.ipynb](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/generate_uts.ipynb)
-- [generator.ipynb](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/generator.ipynb)
-- [merge_uts.ipynb](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/merge_uts.ipynb)
+- [Generate time series](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/generate_time_series.ipynb)
+- [Generate time series (step-by-step)](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/generate_time_series_step_by_step.ipynb)
+- [Different generators](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/different_generators.ipynb)
+- [Merge time series](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/merge_time_series.ipynb)
 
 ## Tools
 
@@ -74,3 +76,12 @@ More Examples:
     - [x] Shapelet transform
     - [x] Standardize
     - [x] Seasonal-trend decomposition with LOESS (STL)
+- [ ] Anomaly/outlier injection [Planned for v0.1.0]
+    - [ ] Point-wise outlier
+        - [ ] Contextual outlier
+        - [ ] Global outlier
+      - [ ] Pattern-wise outlier
+        - [ ] Shapelet outlier
+        - [ ] Trend outlier
+        - [ ] Seasonal outlier
+- [ ] Support for multivariate time series [Planned for v0.2.0]
