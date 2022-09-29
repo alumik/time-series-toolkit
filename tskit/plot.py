@@ -5,9 +5,9 @@ import tskit
 from typing import *
 
 
-def plot(ts: tskit.TimeSeries, title: Optional[str] = None):
+def plot(ts: tskit.TimeSeries, figsize: Sequence[int] = (12, 2), title: Optional[str] = None):
     if ts.values.ndim == 1:
-        _plot_univariate_time_series(ts, title=title)
+        _plot_univariate_time_series(ts, figsize=figsize, title=title)
     else:
         raise NotImplementedError('Only univariate time series are supported.')
 

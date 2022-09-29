@@ -7,7 +7,7 @@ from typing import *
 from statsmodels.tsa.seasonal import STL
 
 
-def merge(
+def combine(
         ts_array: Sequence[tskit.TimeSeries],
         weights: Optional[Sequence[float]] = None,
         standardize_idx: Optional[Sequence[int]] = None,
@@ -15,10 +15,10 @@ def merge(
 ) -> tskit.TimeSeries:
     if any([len(ts) != len(ts_array[0]) for ts in ts_array]):
         raise ValueError('All time series must have the same length.')
-    if len(weights) != len(ts_array):
-        raise ValueError('Length of weights must be the same as length of time series array.')
     if weights is None:
         weights = [1.0] * len(ts_array)
+    if len(weights) != len(ts_array):
+        raise ValueError('Length of weights must be the same as length of time series array.')
     if standardize_idx is None:
         standardize_idx = []
     if index is None:
@@ -46,24 +46,6 @@ def to_shapelet(ts: tskit.TimeSeries, alpha: float = 1.0, inplace: bool = False)
     if inplace:
         return ts
     return tskit.TimeSeries(index=ts.index.copy(), values=shapelet, name=ts.name + '_shapelet')
-
-
-def add_gaussian_noise(
-        ts: tskit.TimeSeries,
-        mean: float = 0.0,
-        std: float = 1.0,
-        amplitude: float = 0.1,
-        inplace: bool = False,
-) -> tskit.TimeSeries:
-    noise = np.random.normal(mean, std, size=len(ts))
-    if inplace:
-        ts.values += noise * amplitude
-        return ts
-    return tskit.TimeSeries(
-        index=ts.index.copy(),
-        values=ts.values + noise * amplitude,
-        name=ts.name + '_noisy',
-    )
 
 
 def stl_decomposition(

@@ -24,24 +24,54 @@ class TimeSeries:
             self.freq = index.step
         self.name = name or str(uuid.uuid4())
 
+    @classmethod
+    def from_generators(
+            cls,
+            generators: Sequence[str | Type['tskit.generator.TimeSeriesGenerator']],
+            generator_args: Optional[Sequence[dict]] = None,
+            weights: Optional[Sequence[float]] = None,
+            standardize_idx: Optional[Sequence[int]] = None,
+            start: Optional[pd.Timestamp | int] = 0,
+            end: Optional[pd.Timestamp | int] = None,
+            length: Optional[int] = None,
+            freq: Optional[str | int] = None,
+            name: Optional[str] = None,
+            dtype: np.dtype = np.float64,
+    ):
+        args = {
+            'start': start,
+            'end': end,
+            'length': length,
+            'freq': freq,
+            'name': name,
+            'dtype': dtype,
+        }
+        generator_objs = [tskit.utils.deserialize(g, obj_type='generator') for g in generators]
+        unknown_generators = [g for obj, g in zip(generator_objs, generators) if obj is None]
+        if unknown_generators:
+            raise ValueError(f'Unknown generators: {unknown_generators}.')
+        if generator_args is None:
+            generator_args = [{} for _ in range(len(generator_objs))]
+        if len(generator_args) != len(generator_objs):
+            raise ValueError('The number of generator arguments must match the number of generators.')
+        series = [g(**args, **kwargs)() for g, kwargs in zip(generator_objs, generator_args)]
+        series = tskit.transform.combine(series, weights=weights, standardize_idx=standardize_idx)
+        return series
+
     def to_shapelet(self, alpha: float = 1.0) -> 'TimeSeries':
         return tskit.transform.to_shapelet(self, alpha=alpha, inplace=True)
 
     def add_noise(self, method: str = 'gaussian', amplitude: float = 0.1, **kwargs) -> 'TimeSeries':
-        match method:
-            case 'gaussian':
-                return tskit.transform.add_gaussian_noise(self, amplitude=amplitude, inplace=True, **kwargs)
-            case _:
-                raise ValueError(f'Unknown noise type: {method}.')
+        obj = tskit.utils.deserialize(method, obj_type='noise')
+        if obj is None:
+            raise ValueError(f'Unknown noise type: {method}.')
+        return obj(self, amplitude=amplitude, inplace=True, **kwargs)
 
     def smooth(self, method: str = 'average', **kwargs) -> 'TimeSeries':
-        match method:
-            case 'average':
-                return tskit.smoothing.average_smoothing(self, inplace=True, **kwargs)
-            case 'exponential':
-                return tskit.smoothing.exponential_smoothing(self, inplace=True, **kwargs)
-            case _:
-                raise ValueError(f'Unknown smoothing method: {method}.')
+        obj = tskit.utils.deserialize(method, obj_type='smoother')
+        if obj is None:
+            raise ValueError(f'Unknown smoothing method: {method}.')
+        return obj(self, inplace=True, **kwargs)
 
     def standardize(self) -> 'TimeSeries':
         return tskit.transform.standardize(self, inplace=True)

@@ -3,7 +3,7 @@ import pandas as pd
 import tskit
 
 
-def average_smoothing(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> tskit.TimeSeries:
+def moving_average(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> tskit.TimeSeries:
     values = pd.Series(ts.values).rolling(window=window).mean().to_numpy()
     if inplace:
         ts.values = values
@@ -11,11 +11,11 @@ def average_smoothing(ts: tskit.TimeSeries, window: int, inplace: bool = False) 
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=values,
-        name=f'{ts.name}_avg{window}',
+        name=f'{ts.name}_ma{window}',
     )
 
 
-def exponential_smoothing(ts: tskit.TimeSeries, alpha: float, inplace: bool = False) -> tskit.TimeSeries:
+def exponential_weighted_moving_average(ts: tskit.TimeSeries, alpha: float, inplace: bool = False) -> tskit.TimeSeries:
     values = pd.Series(ts.values).ewm(alpha=alpha).mean().to_numpy()
     if inplace:
         ts.values = values
@@ -23,5 +23,21 @@ def exponential_smoothing(ts: tskit.TimeSeries, alpha: float, inplace: bool = Fa
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=values,
-        name=f'{ts.name}_ewm{alpha}',
+        name=f'{ts.name}_ewma{alpha}',
     )
+
+
+def median(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> tskit.TimeSeries:
+    values = pd.Series(ts.values).rolling(window=window).median().to_numpy()
+    if inplace:
+        ts.values = values
+        return ts
+    return tskit.TimeSeries(
+        index=ts.index.copy(),
+        values=values,
+        name=f'{ts.name}_med{window}',
+    )
+
+
+ma = moving_average
+ewma = exponential_weighted_moving_average
