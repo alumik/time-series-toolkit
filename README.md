@@ -43,22 +43,24 @@ More Examples:
 ## Tools
 
 - [x] Time series generation
-    - [x] Random walk
-    - [x] Sine
-    - [x] Cosine
-    - [x] Linear
-    - [x] Gaussian
-    - [x] Uniform
-    - [x] Step
-    - [x] Exponential
-    - [x] Poisson
-    - [x] LogNormal
-    - [x] Gamma
-    - [x] Square
-    - [x] Sawtooth
-    - [x] Triangle
-    - [x] Impulse
-    - [x] Perlin
+    - [x] From generators
+        - [x] Random walk
+        - [x] Sine
+        - [x] Cosine
+        - [x] Linear
+        - [x] Gaussian
+        - [x] Uniform
+        - [x] Step
+        - [x] Exponential
+        - [x] Poisson
+        - [x] LogNormal
+        - [x] Gamma
+        - [x] Square
+        - [x] Sawtooth
+        - [x] Triangle
+        - [x] Impulse
+        - [x] Perlin
+    - [ ] From existing time series samples *[Planned for v0.1.0]*
 - [x] Add noise to time series
     - [x] Gaussian noise
     - [x] Uniform noise
@@ -76,7 +78,7 @@ More Examples:
     - [x] Shapelet transform
     - [x] Standardize
     - [x] Seasonal-trend decomposition with LOESS (STL)
-- [ ] Anomaly/outlier injection [Planned for v0.1.0]
+- [ ] Anomaly/outlier injection *[Planned for v0.1.0]*
     - [ ] Point-wise outlier
         - [ ] Contextual outlier
         - [ ] Global outlier
@@ -84,4 +86,4 @@ More Examples:
         - [ ] Shapelet outlier
         - [ ] Trend outlier
         - [ ] Seasonal outlier
-- [ ] Support for multivariate time series [Planned for v0.2.0]
+- [ ] Support for multivariate time series *[Planned for v0.2.0]*
