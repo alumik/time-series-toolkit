@@ -13,6 +13,25 @@ def combine(
         standardize_idx: Optional[Sequence[int]] = None,
         index: Optional[pd.DatetimeIndex | pd.RangeIndex] = None,
 ) -> tskit.TimeSeries:
+    """
+    Combine multiple time series into one.
+
+    Parameters
+    ----------
+    ts_array: list of tskit.TimeSeries
+        The time series to combine.
+    weights: list of float, optional, default: None
+        The weights to apply to each time series.
+    standardize_idx: list of int, optional, default: None
+        The indices of the time series to standardize.
+    index: pd.DatetimeIndex or pd.RangeIndex, optional, default: None
+        The index of the combined time series. If None, the index of the first time series is used.
+
+    Returns
+    -------
+    tskit.TimeSeries
+        The combined time series.
+    """
     if any([len(ts) != len(ts_array[0]) for ts in ts_array]):
         raise ValueError('All time series must have the same length.')
     if weights is None:
@@ -37,6 +56,28 @@ def combine(
 
 
 def to_shapelet(ts: tskit.TimeSeries, alpha: float = 1.0, inplace: bool = False) -> tskit.TimeSeries:
+    """
+    Convert the time series to a shapelet.
+
+    A shapelet is a time series whose start and end values are equal.
+    This method will convert the time series to a shapelet by gradually minimizing the difference between
+    the start and end values along the time series.
+
+    Parameters
+    ----------
+    ts: tskit.TimeSeries
+        The time series to convert.
+    alpha: float, optional, default: 1.0
+        A non-negative float that controls how much the shapelet deviates from the original time series.
+        The smaller the alpha, the more the shapelet deviates from the original time series.
+    inplace: bool, optional, default: False
+        Whether to modify the time series in place.
+
+    Returns
+    -------
+    tskit.TimeSeries
+        The shapelet.
+    """
     if inplace:
         shapelet = ts.values
     else:
@@ -52,6 +93,24 @@ def stl_decomposition(
         ts: tskit.TimeSeries,
         **kwargs
 ):
+    """
+    Perform seasonal and trend decomposition using LOESS.
+
+    Parameters
+    ----------
+    ts: tskit.TimeSeries
+        The time series to decompose.
+
+    Returns
+    -------
+    statsmodels.tsa.seasonal.DecomposeResult
+        Estimated seasonal, trend, and residual components.
+
+    Other Parameters
+    ----------------
+    **kwargs
+        Other keyword arguments to pass to `statsmodels.tsa.seasonal.STL`.
+    """
     stl = STL(pd.Series(ts.values, index=ts.index), **kwargs)
     return stl.fit()
 
@@ -61,6 +120,22 @@ def tile(
         n: int,
         inplace: bool = False,
 ) -> tskit.TimeSeries:
+    """
+    Tile the time series n times.
+
+    Parameters
+    ----------
+    ts: tskit.TimeSeries
+        The time series to tile.
+    n: int
+        The number of times to tile the time series.
+    inplace: bool, optional, default: False
+        Whether to modify the time series in place.
+
+    Returns
+    -------
+    tskit.TimeSeries
+    """
     index = tskit.generator.generate_index(start=ts.index[0], length=len(ts.index) * n, freq=ts.freq)
     values = np.tile(ts.values, n)
     if inplace:
@@ -70,8 +145,36 @@ def tile(
     return tskit.TimeSeries(index=index, values=values, name=ts.name + '_tiled')
 
 
-def standardize(ts: tskit.TimeSeries, inplace: bool = False) -> tskit.TimeSeries:
-    values = (ts.values - ts.values.mean()) / ts.values.std()
+def standardize(
+        ts: tskit.TimeSeries,
+        mean: Optional[float] = None,
+        std: Optional[float] = None,
+        inplace: bool = False) -> tskit.TimeSeries:
+    """
+    Standardize the time series.
+
+    Parameters
+    ----------
+    ts: tskit.TimeSeries
+        The time series to standardize.
+    mean: float, optional, default: None
+        The mean to use for standardization. If None, the mean of the time series will be used.
+    std: float, optional, default: None
+        The standard deviation to use for standardization.
+        If None, the standard deviation of the time series will be used.
+    inplace: bool, optional, default: False
+        Whether to modify the time series in place.
+
+    Returns
+    -------
+    tskit.TimeSeries
+        The standardized time series.
+    """
+    if mean is None:
+        mean = ts.values.mean()
+    if std is None:
+        std = ts.values.std()
+    values = (ts.values - mean) / std
     if inplace:
         ts.values = values
         return ts

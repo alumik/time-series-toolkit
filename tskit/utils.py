@@ -5,6 +5,21 @@ import tskit
 
 
 def slugify(value, allow_unicode=False) -> str:
+    """
+    Covert a string to a valid path name by removing or replacing invalid characters.
+
+    Parameters
+    ----------
+    value: str
+        The string to convert.
+    allow_unicode: bool, optional, default: False
+        Whether to allow unicode characters. If False, all non-ASCII characters will be removed.
+
+    Returns
+    -------
+    str
+        The slugified string.
+    """
     value = str(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
@@ -19,6 +34,21 @@ def slugify(value, allow_unicode=False) -> str:
 
 
 def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type: str):
+    """
+    Deserialize an object from a string identifier.
+
+    Parameters
+    ----------
+    identifier: str | tskit.generator.TimeSeriesGenerator
+        The identifier of the object to deserialize.
+    obj_type: str
+        The type of the object to deserialize. Must be one of 'generator', 'smoother', or 'noise'.
+
+    Returns
+    -------
+    tskit.generator.TimeSeriesGenerator | Callable
+        The deserialized object.
+    """
     all_objs = {
         'generator': {
             generator.method: generator
@@ -33,6 +63,7 @@ def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type:
         },
         'noise': {
             'gaussian': tskit.noise.add_gaussian_noise,
+            'uniform': tskit.noise.add_uniform_noise,
             'perlin': tskit.noise.add_perlin_noise,
         }
     }
