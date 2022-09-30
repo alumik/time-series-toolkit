@@ -1,6 +1,6 @@
 # tskit - Time Series Toolkit
 
-![version-0.0.2](https://img.shields.io/badge/version-0.0.1-blue)
+![version-0.0.2](https://img.shields.io/badge/version-0.0.2-blue)
 ![python-3.10](https://img.shields.io/badge/python-3.10-blue?logo=python&logoColor=white)
 [![license-MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/alumik/time-series-toolkit/blob/main/LICENSE)
 
@@ -63,7 +63,7 @@ More Examples:
         - [x] Triangle
         - [x] Impulse
         - [x] Perlin
-    - [ ] From existing time series samples *[Planned for v0.1.0]*
+    - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) From existing time series samples
 - [x] Add noise to time series
     - [x] Gaussian noise
     - [x] Uniform noise
@@ -81,9 +81,9 @@ More Examples:
     - [x] Shapelet transform
     - [x] Standardize
     - [x] Seasonal-trend decomposition with LOESS (STL)
-    - [ ] Split time series into segments *[Planned for v0.1.0]*
-    - [ ] Interpolate missing values *[Planned for v0.1.0]*
-- [ ] Anomaly/outlier injection *[Planned for v0.1.0]*
+    - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Split time series into segments
+    - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Interpolate missing values
+- [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Anomaly/outlier injection
     - [ ] Point-wise outlier
         - [ ] Contextual outlier
         - [ ] Global outlier
@@ -91,4 +91,4 @@ More Examples:
         - [ ] Shapelet outlier
         - [ ] Trend outlier
         - [ ] Seasonal outlier
-- [ ] Support for multivariate time series *[Planned for v0.2.0]*
+- [ ] ![Planned for v0.2.0](https://img.shields.io/badge/milestone-v0.2.0-green) Support for multivariate time series
