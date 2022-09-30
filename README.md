@@ -81,6 +81,8 @@ More Examples:
     - [x] Shapelet transform
     - [x] Standardize
     - [x] Seasonal-trend decomposition with LOESS (STL)
+    - [ ] Split time series into segments *[Planned for v0.1.0]*
+    - [ ] Interpolate missing values *[Planned for v0.1.0]*
 - [ ] Anomaly/outlier injection *[Planned for v0.1.0]*
     - [ ] Point-wise outlier
         - [ ] Contextual outlier
