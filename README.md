@@ -11,14 +11,16 @@ Only univariate time series are supported at the moment.
 ## A Quick Example
 
 ```python
-import tskit
 import pandas as pd
+
+import tskit
 
 ts = (
     tskit.TimeSeries.from_generators(
-        ['sine', 'random_walk'],
-        weights=[1.0, 0.5],
-        standardize_idx=[1],
+        ['sine', 'square', 'random_walk'],
+        generator_args=[{}, {'period': 1440}, {}],
+        weights=[1.0, 0.5, 0.8],
+        standardize_idx=[2],
         start=pd.Timestamp('2022-09-27 00:00:00'),
         length=1440,
         freq='1min',
@@ -26,11 +28,11 @@ ts = (
     .smooth('ewma', alpha=0.5)
     .to_shapelet(alpha=5)
     .tile(10)
-    .add_noise('gaussian', amplitude=0.1)
+    .add_noise('gaussian', amplitude=0.2)
 )
 ts.save('out/uts.csv')
 
-tskit.plot(ts, title=ts.name)
+tskit.plot(ts)
 ```
 
 More Examples:
