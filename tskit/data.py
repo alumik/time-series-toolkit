@@ -2,6 +2,7 @@ import uuid
 import pathlib
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 import tskit
 
@@ -20,23 +21,6 @@ class TimeSeries:
         The values of the time series.
     name: str, optional, default: None
         The name of the time series.
-
-    Attributes
-    ----------
-    index
-    values
-    freq
-    name
-
-    Methods
-    -------
-    from_generators
-    to_shapelet
-    add_noise
-    smooth
-    standardize
-    tile
-    save
     """
 
     def __init__(
@@ -256,6 +240,40 @@ class TimeSeries:
                 df.to_csv(path, **kwargs)
             case _:
                 raise ValueError(f'Unknown format: {save_format}.')
+
+    def plot(
+            self,
+            ax: Optional[plt.Axes] = None,
+            tight_layout: bool = True,
+            show: bool = True,
+            figsize: tuple[int] = (12, 2),
+            title: Optional[str] = None,
+            **kwargs,
+    ):
+        """
+            Plot the TimeSeries.
+
+            Parameters
+            ----------
+            ts: tskit.TimeSeries
+                The TimeSeries to plot.
+            ax: matplotlib.Axes, optional, default: None
+                The axes to plot on. If None, a new figure will be created.
+            tight_layout: bool, optional, default: True
+                Whether to use tight layout.
+            show: bool, optional, default: True
+                Whether to show the plot.
+            figsize: tuple, optional, default: (12, 2)
+                The size of the figure.
+            title: str, optional, default: None
+                The title of the plot.
+
+            Other Parameters
+            ----------------
+            **kwargs
+                Additional keyword arguments to pass to the plotting function.
+            """
+        tskit.plot(self, ax=ax, tight_layout=tight_layout, show=show, figsize=figsize, title=title, **kwargs)
 
     def __len__(self) -> int:
         return len(self.values)

@@ -73,7 +73,7 @@ More Examples:
     - [x] Moving average (MA)
     - [x] Exponential weighted moving average (EWMA)
     - [x] Median filter
-    - [ ] Savitzky-Golay filter
+    - [x] Savitzky-Golay filter
 - [x] Time series transformation
     - [x] Merge multiple time series
     - [x] Tile time series

@@ -60,6 +60,8 @@ def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type:
             'exponential_weighted_moving_average': tskit.smoothing.exponential_weighted_moving_average,
             'ewma': tskit.smoothing.exponential_weighted_moving_average,
             'median': tskit.smoothing.median,
+            'savitzky_golay': tskit.smoothing.savitzky_golay,
+            'savgol': tskit.smoothing.savitzky_golay,
         },
         'noise': {
             'gaussian': tskit.noise.add_gaussian_noise,
