@@ -46,7 +46,7 @@ def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type:
 
     Returns
     -------
-    tskit.generator.TimeSeriesGenerator | Callable
+    any
         The deserialized object.
     """
     all_objs = {
