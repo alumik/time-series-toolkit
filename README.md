@@ -1,6 +1,6 @@
 # tskit - Time Series Toolkit
 
-![version-0.0.1](https://img.shields.io/badge/version-0.0.1-blue)
+![version-0.0.2](https://img.shields.io/badge/version-0.0.1-blue)
 ![python-3.10](https://img.shields.io/badge/python-3.10-blue?logo=python&logoColor=white)
 [![license-MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/alumik/time-series-toolkit/blob/main/LICENSE)
 
@@ -39,7 +39,8 @@ More Examples:
 
 - [Generate time series](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/generate_time_series.ipynb)
 - [Generate time series (step-by-step)](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/generate_time_series_step_by_step.ipynb)
-- [Different generators](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/different_generators.ipynb)
+- [Time series generators](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/time_series_generators.ipynb)
+- [Smoothing methods](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/smoothing_methods.ipynb)
 - [Merge time series](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/merge_time_series.ipynb)
 
 ## Tools
