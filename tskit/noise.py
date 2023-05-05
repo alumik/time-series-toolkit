@@ -1,8 +1,8 @@
 import numpy as np
 
-import tskit
+from typing import Sequence
 
-from typing import *
+import tskit
 
 
 def add_gaussian_noise(
@@ -10,7 +10,7 @@ def add_gaussian_noise(
         mean: float = 0.0,
         std: float = 1.0,
         amplitude: float = 0.1,
-        clip: Optional[Sequence[float]] = None,
+        clip: Sequence[float] | None = None,
         inplace: bool = False,
 ) -> tskit.TimeSeries:
     """
@@ -97,7 +97,7 @@ def add_perlin_noise(
         factor_e: float = 1.0,
         factor_pi: float = 1.0,
         amplitude: float = 0.1,
-        clip: Optional[Sequence[float]] = None,
+        clip: Sequence[float] | None = None,
         inplace: bool = False,
 ) -> tskit.TimeSeries:
     """

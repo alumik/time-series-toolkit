@@ -4,7 +4,7 @@ import unicodedata
 import tskit
 
 
-def slugify(value, allow_unicode=False) -> str:
+def slugify(value: str, allow_unicode: bool = False) -> str:
     """
     Covert a string to a valid path name by removing or replacing invalid characters.
 

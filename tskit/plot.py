@@ -2,16 +2,14 @@ import matplotlib.pyplot as plt
 
 import tskit
 
-from typing import *
-
 
 def plot(
         ts: tskit.TimeSeries,
-        ax: Optional[plt.Axes] = None,
+        ax: plt.Axes | None = None,
         tight_layout: bool = True,
         show: bool = True,
         figsize: tuple[int] = (12, 2),
-        title: Optional[str] = None,
+        title: str | None = None,
         **kwargs,
 ):
     """
@@ -56,11 +54,11 @@ def plot(
 
 def _plot_univariate_time_series(
         ts: tskit.TimeSeries,
-        ax: Optional[plt.Axes] = None,
+        ax: plt.Axes | None = None,
         tight_layout: bool = True,
         show: bool = True,
         figsize: tuple[int] = (12, 2),
-        title: Optional[str] = None,
+        title: str | None = None,
         **kwargs,
 ):
     """

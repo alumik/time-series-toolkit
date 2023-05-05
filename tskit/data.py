@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import tskit
+from typing import Sequence, Union, Self
 
-from typing import *
+import tskit
 
 
 class TimeSeries:
@@ -27,7 +27,7 @@ class TimeSeries:
             self,
             index: pd.RangeIndex | pd.DatetimeIndex,
             values: np.ndarray,
-            name: Optional[str] = None,
+            name: str | None = None,
     ):
         self.index = index
         self.values = values
@@ -40,17 +40,17 @@ class TimeSeries:
     @classmethod
     def from_generators(
             cls,
-            generators: Sequence[str | Type['tskit.generator.TimeSeriesGenerator']],
-            generator_args: Optional[Sequence[dict]] = None,
-            weights: Optional[Sequence[float]] = None,
-            standardize_idx: Optional[Sequence[int]] = None,
-            start: Optional[pd.Timestamp | int] = 0,
-            end: Optional[pd.Timestamp | int] = None,
-            length: Optional[int] = None,
-            freq: Optional[str | int] = None,
-            name: Optional[str] = None,
+            generators: Sequence[Union[str, 'tskit.generator.TimeSeriesGenerator']],
+            generator_args: Sequence[dict] | None = None,
+            weights: Sequence[float] | None = None,
+            standardize_idx: Sequence[int] | None = None,
+            start: pd.Timestamp | int | None = 0,
+            end: pd.Timestamp | int | None = None,
+            length: int | None = None,
+            freq: str | int | None = None,
+            name: str | None = None,
             dtype: np.dtype = np.float64,
-    ):
+    ) -> Self:
         """
         Generate a time series from a list of generators.
 
@@ -180,7 +180,7 @@ class TimeSeries:
             raise ValueError(f'Unknown smoothing method: {method}.')
         return obj(self, inplace=True, **kwargs)
 
-    def standardize(self, mean: Optional[float] = None, std: Optional[float] = None) -> 'TimeSeries':
+    def standardize(self, mean: float | None = None, std: float | None = None) -> 'TimeSeries':
         """
         Standardize the time series.
 
@@ -214,7 +214,7 @@ class TimeSeries:
         """
         return tskit.transform.tile(self, n=n, inplace=True)
 
-    def save(self, path: Optional[str] = None, save_format: str = 'csv', **kwargs):
+    def save(self, path: str | None = None, save_format: str = 'csv', **kwargs):
         """
         Save the time series to a file.
 
@@ -243,11 +243,11 @@ class TimeSeries:
 
     def plot(
             self,
-            ax: Optional[plt.Axes] = None,
+            ax: plt.Axes | None = None,
             tight_layout: bool = True,
             show: bool = True,
             figsize: tuple[int] = (12, 2),
-            title: Optional[str] = None,
+            title: str | None = None,
             **kwargs,
     ):
         """

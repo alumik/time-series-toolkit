@@ -1,7 +1,7 @@
 # tskit - Time Series Toolkit
 
-![version-0.0.2](https://img.shields.io/badge/version-0.0.2-blue)
-![python-3.10](https://img.shields.io/badge/python-3.10-blue?logo=python&logoColor=white)
+![version-0.0.3](https://img.shields.io/badge/version-0.0.3-blue)
+![python->=3.11](https://img.shields.io/badge/python->=3.11-blue?logo=python&logoColor=white)
 [![license-MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/alumik/time-series-toolkit/blob/main/LICENSE)
 
 `tskit` is a collection of tools for time series data analysis.

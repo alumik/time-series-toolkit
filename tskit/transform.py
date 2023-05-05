@@ -1,17 +1,17 @@
 import numpy as np
 import pandas as pd
 
-import tskit
-
-from typing import *
+from typing import Sequence
 from statsmodels.tsa.seasonal import STL
+
+import tskit
 
 
 def combine(
         ts_array: Sequence[tskit.TimeSeries],
-        weights: Optional[Sequence[float]] = None,
-        standardize_idx: Optional[Sequence[int]] = None,
-        index: Optional[pd.DatetimeIndex | pd.RangeIndex] = None,
+        weights: Sequence[float] | None = None,
+        standardize_idx: Sequence[int] | None = None,
+        index: pd.DatetimeIndex | pd.RangeIndex | None = None,
 ) -> tskit.TimeSeries:
     """
     Combine multiple time series into one.
@@ -147,8 +147,8 @@ def tile(
 
 def standardize(
         ts: tskit.TimeSeries,
-        mean: Optional[float] = None,
-        std: Optional[float] = None,
+        mean: float | None = None,
+        std: float | None = None,
         inplace: bool = False) -> tskit.TimeSeries:
     """
     Standardize the time series.

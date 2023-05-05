@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 
-import tskit
+from typing import Sequence
 
-from typing import *
+import tskit
 
 
 class TimeSeriesGenerator:
@@ -11,11 +11,11 @@ class TimeSeriesGenerator:
 
     def __init__(
             self,
-            start: Optional[pd.Timestamp | int] = 0,
-            end: Optional[pd.Timestamp | int] = None,
-            length: Optional[int] = None,
-            freq: Optional[str | int] = None,
-            name: Optional[str] = None,
+            start: pd.Timestamp | int | None = 0,
+            end: pd.Timestamp | int | None = None,
+            length: int | None = None,
+            freq: str | int | None = None,
+            name: str | None = None,
             dtype: np.dtype = np.float64,
     ):
         self.start = start
@@ -64,7 +64,7 @@ class SineGenerator(TimeSeriesGenerator):
     def __init__(
             self,
             amplitude: float = 1.0,
-            period: Optional[float] = None,
+            period: float | None = None,
             phase: float = 0.0,
             **kwargs,
     ):
@@ -88,7 +88,7 @@ class CosineGenerator(TimeSeriesGenerator):
     def __init__(
             self,
             amplitude: float = 1.0,
-            period: Optional[float] = None,
+            period: float | None = None,
             phase: float = 0.0,
             **kwargs,
     ):
@@ -338,7 +338,7 @@ class ImpulseGenerator(TimeSeriesGenerator):
             self,
             base: float = 0.0,
             impulse_size: float = 1.0,
-            impulse_time: Optional[Sequence[pd.Timestamp | int]] = None,
+            impulse_time: Sequence[pd.Timestamp | int] | None = None,
             **kwargs,
     ):
         super().__init__(**kwargs)

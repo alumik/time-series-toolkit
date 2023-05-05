@@ -3,14 +3,12 @@ import pandas as pd
 
 import tskit
 
-from typing import *
-
 
 def generate_index(
-        start: Optional[pd.Timestamp | int] = None,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
+        start: pd.Timestamp | int | None = None,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
 ) -> pd.DatetimeIndex | pd.RangeIndex:
     constructors = [
         arg_name
@@ -52,11 +50,11 @@ def generate_index(
 def random_walk(
         mean: float = 0.0,
         std: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'random_walk',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'random_walk',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -66,13 +64,13 @@ def random_walk(
 
 def sine(
         amplitude: float = 1.0,
-        period: Optional[float] = None,
+        period: float | None = None,
         phase: float = 0.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'sine',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'sine',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -84,13 +82,13 @@ def sine(
 
 def cosine(
         amplitude: float = 1.0,
-        period: Optional[float] = None,
+        period: float | None = None,
         phase: float = 0.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'cosine',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'cosine',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -103,11 +101,11 @@ def cosine(
 def linear(
         slope: float = 1.0,
         intercept: float = 0.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'linear',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'linear',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -118,11 +116,11 @@ def linear(
 def gaussian(
         mean: float = 0.0,
         std: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'gaussian',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'gaussian',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -133,11 +131,11 @@ def gaussian(
 def uniform(
         low: float = -1.0,
         high: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'uniform',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'uniform',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -148,11 +146,11 @@ def uniform(
 def step(
         step_size: int = 1,
         delta: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'step',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'step',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -162,11 +160,11 @@ def step(
 
 def exponential(
         scale: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'exponential',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'exponential',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -176,11 +174,11 @@ def exponential(
 
 def poisson(
         lam: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'poisson',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'poisson',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -191,11 +189,11 @@ def poisson(
 def log_normal(
         mean: float = 0.0,
         std: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'log_normal',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'log_normal',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -206,11 +204,11 @@ def log_normal(
 def gamma(
         shape: float = 1.0,
         scale: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'gamma',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'gamma',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -221,11 +219,11 @@ def gamma(
 def square(
         amplitude: float = 1.0,
         period: float = 2.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'square',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'square',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -236,11 +234,11 @@ def square(
 def sawtooth(
         amplitude: float = 1.0,
         period: float = 2.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'sawtooth',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'sawtooth',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -251,11 +249,11 @@ def sawtooth(
 def triangle(
         amplitude: float = 1.0,
         period: float = 2.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'triangle',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'triangle',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -268,12 +266,12 @@ def triangle(
 def impulse(
         base: float = 0.0,
         impulse_size: float = 1.0,
-        impulse_time: Optional[Sequence[pd.Timestamp | int]] = None,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'impulse',
+        impulse_time: Sequence[pd.Timestamp | int] | None = None,
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'impulse',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
@@ -293,11 +291,11 @@ def perlin(
         factor_x: float = 2.0,
         factor_e: float = 1.0,
         factor_pi: float = 1.0,
-        start: Optional[pd.Timestamp | int] = 0,
-        end: Optional[pd.Timestamp | int] = None,
-        length: Optional[int] = None,
-        freq: Optional[str | int] = None,
-        name: Optional[str] = 'perlin',
+        start: pd.Timestamp | int | None = 0,
+        end: pd.Timestamp | int | None = None,
+        length: int | None = None,
+        freq: str | int | None = None,
+        name: str | None = 'perlin',
         dtype: np.dtype = np.float64,
 ) -> tskit.TimeSeries:
     index = generate_index(start=start, end=end, length=length, freq=freq)
