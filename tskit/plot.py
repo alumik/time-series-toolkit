@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 
+from matplotlib.ticker import MaxNLocator
+
 import tskit
 
 
@@ -90,6 +92,7 @@ def _plot_univariate_time_series(
         fig = ax.get_figure()
 
     ax.plot(ts.index, ts.values, **kwargs)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     ax.set_title(ts.name if title is None else title)
 
     if ts.index.dtype == 'datetime64[ns]':

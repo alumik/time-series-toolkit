@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from typing import Sequence, Union, Self
+from typing import Sequence, Union, Self, Any
 
 import tskit
 
@@ -12,30 +12,44 @@ import tskit
 class TimeSeries:
     """
     TimeSeries class for time series data.
-
-    Parameters
-    ----------
-    index: pd.RangeIndex or pd.DatetimeIndex
-        The index of the time series.
-    values: np.ndarray
-        The values of the time series.
-    name: str, optional, default: None
-        The name of the time series.
     """
 
     def __init__(
             self,
-            index: pd.RangeIndex | pd.DatetimeIndex,
-            values: np.ndarray,
+            index: Sequence[int] | pd.RangeIndex | pd.DatetimeIndex,
+            values: Sequence,
             name: str | None = None,
     ):
-        self.index = index
-        self.values = values
+        """
+        Initialize a TimeSeries object.
+
+        Parameters
+        ----------
+        index: Sequence[int] or pd.RangeIndex or pd.DatetimeIndex
+            The index of the time series.
+        values: Sequence
+            The values of the time series.
+        name: str, optional, default: None
+            The name of the time series.
+        """
+        if isinstance(index, pd.RangeIndex) or isinstance(index, pd.DatetimeIndex):
+            self.index = index
+        elif isinstance(index, Sequence) and all([isinstance(i, int) for i in index]):
+            self.index = pd.Index(index)
+        else:
+            raise TypeError('Index must be a pd.RangeIndex, pd.DatetimeIndex or Sequence.')
+        self.values = np.asarray(values)
+        self.name = name or str(uuid.uuid4())
+
+        if len(self.index) != len(self.values):
+            raise ValueError('Length of index and values must be the same.')
+
         if isinstance(index, pd.DatetimeIndex):
             self.freq = index.freq
-        else:
+        elif isinstance(index, pd.RangeIndex):
             self.freq = index.step
-        self.name = name or str(uuid.uuid4())
+        else:
+            self.freq = None
 
     @classmethod
     def from_generators(
@@ -94,18 +108,53 @@ class TimeSeries:
             'dtype': dtype,
         }
         generator_objs = [tskit.utils.deserialize(g, obj_type='generator') for g in generators]
-        unknown_generators = [g for obj, g in zip(generator_objs, generators) if obj is None]
-        if unknown_generators:
+        if unknown_generators := [g for obj, g in zip(generator_objs, generators) if obj is None]:
             raise ValueError(f'Unknown generators: {unknown_generators}.')
+        if len(generator_objs) == 0:
+            raise ValueError('At least one generator must be specified.')
         if generator_args is None:
             generator_args = [{} for _ in range(len(generator_objs))]
         if len(generator_args) != len(generator_objs):
             raise ValueError('The number of generator arguments must match the number of generators.')
         series = [g(**args, **kwargs)() for g, kwargs in zip(generator_objs, generator_args)]
-        series = tskit.transform.combine(series, weights=weights, standardize_idx=standardize_idx)
+        series = tskit.transform.add(series, weights=weights, standardize_idx=standardize_idx)
         return series
 
-    def to_shapelet(self, alpha: float = 1.0) -> 'TimeSeries':
+    @classmethod
+    def from_config(cls, config: dict[str, Any]) -> Self:
+        """
+        Generate a time series from a config dictionary.
+
+        Parameters
+        ----------
+        config: dict
+            The config dictionary.
+
+        Returns
+        -------
+        tskit.TimeSeries
+            The generated time series.
+        """
+        generators = []
+        generator_args = []
+        weights = []
+        standardize_idx = []
+        generator_configs = config.pop('generators')
+        for idx, generator_config in enumerate(generator_configs):
+            generators.append(generator_config['name'])
+            generator_args.append(generator_config.get('args', {}))
+            weights.append(generator_config.get('weight', 1.0))
+            if generator_config.get('standardize', False):
+                standardize_idx.append(idx)
+        return cls.from_generators(
+            generators=generators,
+            generator_args=generator_args,
+            weights=weights,
+            standardize_idx=standardize_idx,
+            **config,
+        )
+
+    def to_shapelet(self, alpha: float = 1.0) -> Self:
         """
         Convert the time series to a shapelet.
 
@@ -128,7 +177,7 @@ class TimeSeries:
         """
         return tskit.transform.to_shapelet(self, alpha=alpha, inplace=True)
 
-    def add_noise(self, method: str = 'gaussian', amplitude: float = 0.1, **kwargs) -> 'TimeSeries':
+    def add_noise(self, method: str = 'gaussian', amplitude: float = 0.1, **kwargs) -> Self:
         """
         Add noise to the time series.
 
@@ -149,12 +198,12 @@ class TimeSeries:
         **kwargs:
             Additional keyword arguments to pass to the noise method.
         """
-        obj = tskit.utils.deserialize(method, obj_type='noise')
-        if obj is None:
+        noise_func = tskit.utils.deserialize(method, obj_type='noise')
+        if noise_func is None:
             raise ValueError(f'Unknown noise type: {method}.')
-        return obj(self, amplitude=amplitude, inplace=True, **kwargs)
+        return noise_func(self, amplitude=amplitude, inplace=True, **kwargs)
 
-    def smooth(self, method: str = 'moving_average', **kwargs) -> 'TimeSeries':
+    def smooth(self, method: str = 'moving_average', **kwargs) -> Self:
         """
         Smooth the time series.
 
@@ -180,7 +229,7 @@ class TimeSeries:
             raise ValueError(f'Unknown smoothing method: {method}.')
         return obj(self, inplace=True, **kwargs)
 
-    def standardize(self, mean: float | None = None, std: float | None = None) -> 'TimeSeries':
+    def standardize(self, mean: float | None = None, std: float | None = None) -> Self:
         """
         Standardize the time series.
 
@@ -199,7 +248,7 @@ class TimeSeries:
         """
         return tskit.transform.standardize(self, mean=mean, std=std, inplace=True)
 
-    def tile(self, n: int) -> 'TimeSeries':
+    def tile(self, n: int) -> Self:
         """
         Tile the time series n times.
 

@@ -1,6 +1,8 @@
 import re
 import unicodedata
 
+from typing import Callable
+
 import tskit
 
 
@@ -33,7 +35,7 @@ def slugify(value: str, allow_unicode: bool = False) -> str:
     return re.sub(r'[-\s]+', '-', value).strip('-_')
 
 
-def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type: str):
+def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type: str) -> Callable:
     """
     Deserialize an object from a string identifier.
 
@@ -46,7 +48,7 @@ def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type:
 
     Returns
     -------
-    any
+    Callable
         The deserialized object.
     """
     all_objs = {

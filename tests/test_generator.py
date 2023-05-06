@@ -33,3 +33,11 @@ class TestGenerator(unittest.TestCase):
     def test_generate_datetime_index_with_start_and_length_and_freq(self):
         index = tskit.generator.generate_index(start=pd.Timestamp('2000-01-01'), length=5, freq='5D')
         pd.testing.assert_index_equal(pd.date_range('2000-01-01', periods=5, freq='5D', name='timestamp'), index)
+
+    def test_unknown_generators(self):
+        with self.assertRaisesRegex(ValueError, r'Unknown generators: \[\'abcd\'\]\.'):
+            tskit.TimeSeries.from_generators(['abcd', 'random_walk'])
+
+    def test_empty_generators(self):
+        with self.assertRaisesRegex(ValueError, r'At least one generator must be specified\.'):
+            tskit.TimeSeries.from_generators([])

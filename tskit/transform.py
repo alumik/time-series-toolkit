@@ -7,7 +7,7 @@ from statsmodels.tsa.seasonal import STL
 import tskit
 
 
-def combine(
+def add(
         ts_array: Sequence[tskit.TimeSeries],
         weights: Sequence[float] | None = None,
         standardize_idx: Sequence[int] | None = None,
