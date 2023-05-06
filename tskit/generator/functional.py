@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from typing import Sequence
+
 import tskit
 
 
@@ -39,7 +41,7 @@ def generate_index(
                 f'`start - end` must be evenly divisible by `freq`, but got {start}, {end}, {freq}.'
             )
         index = pd.RangeIndex(
-            start=start if start is not None else end - freq * length + step,
+            start=start if start is not None else end - freq * (length - 1),
             stop=end + freq if end is not None else start + freq * length,
             step=freq,
             name='timestamp',

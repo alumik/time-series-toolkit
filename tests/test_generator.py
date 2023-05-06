@@ -28,8 +28,8 @@ class TestGenerator(unittest.TestCase):
 
     def test_generate_datetime_index_with_start_and_end(self):
         index = tskit.generator.generate_index(start=pd.Timestamp('2000-01-01'), end=pd.Timestamp('2000-01-05'))
-        pd.testing.assert_index_equal(pd.date_range('2000-01-01', '2000-01-05'), index)
+        pd.testing.assert_index_equal(pd.date_range('2000-01-01', '2000-01-05', name='timestamp'), index)
 
     def test_generate_datetime_index_with_start_and_length_and_freq(self):
         index = tskit.generator.generate_index(start=pd.Timestamp('2000-01-01'), length=5, freq='5D')
-        pd.testing.assert_index_equal(pd.date_range('2000-01-01', periods=5, freq='5D'), index)
+        pd.testing.assert_index_equal(pd.date_range('2000-01-01', periods=5, freq='5D', name='timestamp'), index)
