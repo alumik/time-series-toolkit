@@ -10,7 +10,7 @@ def plot(
         ax: plt.Axes | None = None,
         tight_layout: bool = True,
         show: bool = True,
-        figsize: tuple[int] = (12, 2),
+        figsize: tuple[int, int] = (12, 2),
         title: str | None = None,
         **kwargs,
 ):
@@ -32,7 +32,7 @@ def plot(
     figsize: tuple, optional, default: (12, 2)
         The size of the figure.
     title: str, optional, default: None
-        The title of the plot.
+        The title of the plot. If None, the name of the time series will be used.
 
     Other Parameters
     ----------------
@@ -59,7 +59,7 @@ def _plot_univariate_time_series(
         ax: plt.Axes | None = None,
         tight_layout: bool = True,
         show: bool = True,
-        figsize: tuple[int] = (12, 2),
+        figsize: tuple[int, int] = (12, 2),
         title: str | None = None,
         **kwargs,
 ):
@@ -79,7 +79,7 @@ def _plot_univariate_time_series(
     figsize: tuple, optional, default: (12, 2)
         The size of the figure.
     title: str, optional, default: None
-        The title of the plot.
+        The title of the plot. If None, the name of the time series will be used.
 
     Other Parameters
     ----------------
