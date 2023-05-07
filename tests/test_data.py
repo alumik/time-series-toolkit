@@ -51,7 +51,7 @@ class TestGenerator(unittest.TestCase):
         ts.plot()
 
     def test_time_series_with_integer_index_not_regularly_spaced(self):
-        with self.assertRaisesRegex(ValueError, r'Index must be regularly spaced\.'):
+        with self.assertRaisesRegex(ValueError, r'`index` must be regularly spaced\.'):
             tskit.TimeSeries(
                 index=[0, 2, 7],
                 values=[0, 1, 2],

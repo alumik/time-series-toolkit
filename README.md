@@ -1,6 +1,6 @@
 # tskit - Time Series Toolkit
 
-![version-0.0.4](https://img.shields.io/badge/version-0.0.4-blue)
+![version-0.0.5](https://img.shields.io/badge/version-0.0.5-blue)
 ![python->=3.11](https://img.shields.io/badge/python->=3.11-blue?logo=python&logoColor=white)
 [![license-MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/alumik/time-series-toolkit/blob/main/LICENSE)
 
@@ -46,6 +46,8 @@ More Examples:
 ## Tools
 
 - [x] Time series generation
+    - [x] Infer the frequency of time series
+    - [x] From configs
     - [x] From generators
         - [x] Random walk
         - [x] Sine
