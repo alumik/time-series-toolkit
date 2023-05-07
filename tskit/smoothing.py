@@ -1,11 +1,15 @@
 import scipy
-import numpy as np
 import pandas as pd
 
 import tskit
 
 
-def moving_average(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> tskit.TimeSeries:
+def moving_average(
+        ts: tskit.TimeSeries,
+        window: int,
+        inplace: bool = False,
+        name: str | None = None,
+) -> tskit.TimeSeries:
     """
     Smooth a TimeSeries using a moving average (MA).
 
@@ -17,6 +21,9 @@ def moving_average(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> 
         The window size.
     inplace: bool, optional, default: False
         Whether to smooth the TimeSeries in place.
+    name: str, optional, default: None
+        The name of the new TimeSeries. The default is the name of the original TimeSeries with '_ma'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
@@ -34,7 +41,12 @@ def moving_average(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> 
     )
 
 
-def exponential_weighted_moving_average(ts: tskit.TimeSeries, alpha: float, inplace: bool = False) -> tskit.TimeSeries:
+def exponential_weighted_moving_average(
+        ts: tskit.TimeSeries,
+        alpha: float,
+        inplace: bool = False,
+        name: str | None = None,
+) -> tskit.TimeSeries:
     """
     Smooth a TimeSeries using an exponential weighted moving average (EWMA).
 
@@ -46,6 +58,9 @@ def exponential_weighted_moving_average(ts: tskit.TimeSeries, alpha: float, inpl
         The smoothing factor.
     inplace: bool, optional, default: False
         Whether to smooth the TimeSeries in place.
+    name: str, optional, default: None
+        The name of the new TimeSeries. The default is the name of the original TimeSeries with '_ewma'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
@@ -63,7 +78,12 @@ def exponential_weighted_moving_average(ts: tskit.TimeSeries, alpha: float, inpl
     )
 
 
-def median(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> tskit.TimeSeries:
+def median(
+        ts: tskit.TimeSeries,
+        window: int,
+        inplace: bool = False,
+        name: str | None = None,
+) -> tskit.TimeSeries:
     """
     Smooth a TimeSeries using a median filter.
 
@@ -75,6 +95,9 @@ def median(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> tskit.Ti
         The window size.
     inplace: bool, optional, default: False
         Whether to smooth the TimeSeries in place.
+    name: str, optional, default: None
+        The name of the new TimeSeries. The default is the name of the original TimeSeries with '_med'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
@@ -92,7 +115,13 @@ def median(ts: tskit.TimeSeries, window: int, inplace: bool = False) -> tskit.Ti
     )
 
 
-def savitzky_golay(ts: tskit.TimeSeries, window: int, order: int, inplace: bool = False) -> tskit.TimeSeries:
+def savitzky_golay(
+        ts: tskit.TimeSeries,
+        window: int,
+        order: int,
+        inplace: bool = False,
+        name: str | None = None,
+) -> tskit.TimeSeries:
     """
     Smooth a TimeSeries using a Savitzky-Golay filter.
 
@@ -106,6 +135,9 @@ def savitzky_golay(ts: tskit.TimeSeries, window: int, order: int, inplace: bool 
         The order of the polynomial used to fit the samples.
     inplace: bool, optional, default: False
         Whether to smooth the TimeSeries in place.
+    name: str, optional, default: None
+        The name of the new TimeSeries. The default is the name of the original TimeSeries with '_sg'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------

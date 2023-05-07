@@ -11,7 +11,8 @@ def add(
         ts_array: Sequence[tskit.TimeSeries],
         weights: Sequence[float] | None = None,
         standardize_idx: Sequence[int] | None = None,
-        index: pd.DatetimeIndex | pd.RangeIndex | None = None,
+        index: pd.DatetimeIndex | pd.RangeIndex | Sequence[int] | None = None,
+        name: str | None = None,
 ) -> tskit.TimeSeries:
     """
     Combine multiple time series into one.
@@ -24,8 +25,10 @@ def add(
         The weights to apply to each time series.
     standardize_idx: list of int, optional, default: None
         The indices of the time series to standardize.
-    index: pd.DatetimeIndex or pd.RangeIndex, optional, default: None
+    index: Sequence[int] or pd.DatetimeIndex or pd.RangeIndex, optional, default: None
         The index of the combined time series. If None, the index of the first time series is used.
+    name: str, optional, default: None
+        The name of the combined time series. If None, the names of the input time series are combined.
 
     Returns
     -------
@@ -51,11 +54,16 @@ def add(
     return tskit.TimeSeries(
         index=index,
         values=values,
-        name=f'[{"+".join([ts.name for ts in ts_array])}]',
+        name=f'[{"+".join([ts.name for ts in ts_array])}]' if name is None else name,
     )
 
 
-def to_shapelet(ts: tskit.TimeSeries, alpha: float = 1.0, inplace: bool = False) -> tskit.TimeSeries:
+def to_shapelet(
+        ts: tskit.TimeSeries,
+        alpha: float = 1.0,
+        inplace: bool = False,
+        name: str | None = None,
+) -> tskit.TimeSeries:
     """
     Convert the time series to a shapelet.
 
@@ -72,6 +80,9 @@ def to_shapelet(ts: tskit.TimeSeries, alpha: float = 1.0, inplace: bool = False)
         The smaller the alpha, the more the shapelet deviates from the original time series.
     inplace: bool, optional, default: False
         Whether to modify the time series in place.
+    name: str, optional, default: None
+        The name of the shapelet. The default is the name of the original TimeSeries with '_shapelet'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
@@ -86,12 +97,16 @@ def to_shapelet(ts: tskit.TimeSeries, alpha: float = 1.0, inplace: bool = False)
         shapelet[i] -= (shapelet[i] - shapelet[0]) * (i / (len(shapelet) - 1)) ** alpha
     if inplace:
         return ts
-    return tskit.TimeSeries(index=ts.index.copy(), values=shapelet, name=ts.name + '_shapelet')
+    return tskit.TimeSeries(
+        index=ts.index.copy(),
+        values=shapelet,
+        name=f'{ts.name}_shapelet' if name is None else name,
+    )
 
 
 def stl_decomposition(
         ts: tskit.TimeSeries,
-        **kwargs
+        **kwargs,
 ):
     """
     Perform seasonal and trend decomposition using LOESS.
@@ -118,10 +133,13 @@ def stl_decomposition(
 def tile(
         ts: tskit.TimeSeries,
         n: int,
+        interpolate_method: str = 'linear',
+        fill_value: float = 0.0,
         inplace: bool = False,
+        name: str | None = None,
 ) -> tskit.TimeSeries:
     """
-    Tile the time series n times.
+    Tile the time series n times. The time series must be interpolated before tiling.
 
     Parameters
     ----------
@@ -129,27 +147,38 @@ def tile(
         The time series to tile.
     n: int
         The number of times to tile the time series.
+    interpolate_method: str, optional, default: 'linear'
+        The interpolation method to use. See `tskit.transform.interpolate` for more details.
+    fill_value: float, optional, default: 0.0
+        The value to use for filling missing values. This is only used when `interpolate_method` is set to 'constant'.
     inplace: bool, optional, default: False
         Whether to modify the time series in place.
+    name: str, optional, default: None
+        The name of the tiled time series. The default is the name of the original TimeSeries with '_tiled'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
     tskit.TimeSeries
+        The tiled time series.
     """
-    index = tskit.generator.generate_index(start=ts.index[0], length=len(ts.index) * n, freq=ts.freq)
-    values = np.tile(ts.values, n)
+    ts_ = tskit.transform.interpolate(ts, method=interpolate_method, fill_value=fill_value)
+    index = tskit.generator.generate_index(start=ts_.index[0], length=len(ts_.index) * n, freq=ts_.freq)
+    values = np.tile(ts_.values, n)
     if inplace:
         ts.index = index
         ts.values = values
         return ts
-    return tskit.TimeSeries(index=index, values=values, name=ts.name + '_tiled')
+    return tskit.TimeSeries(index=index, values=values, name=f'{ts_.name}_tiled' if name is None else name)
 
 
 def standardize(
         ts: tskit.TimeSeries,
         mean: float | None = None,
         std: float | None = None,
-        inplace: bool = False) -> tskit.TimeSeries:
+        inplace: bool = False,
+        name: str | None = None,
+) -> tskit.TimeSeries:
     """
     Standardize the time series.
 
@@ -164,6 +193,9 @@ def standardize(
         If None, the standard deviation of the time series will be used.
     inplace: bool, optional, default: False
         Whether to modify the time series in place.
+    name: str, optional, default: None
+        The name of the standardized time series. The default is the name of the original TimeSeries with '_std'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
@@ -181,5 +213,37 @@ def standardize(
     return tskit.TimeSeries(
         index=ts.index,
         values=values,
-        name=f'{ts.name}_std',
+        name=f'{ts.name}_std' if name is None else name,
     )
+
+
+def interpolate(
+        ts: tskit.TimeSeries,
+        method: str = 'linear',
+        fill_value: float = 0.0,
+        inplace: bool = False,
+        name: str | None = None,
+) -> tskit.TimeSeries:
+    """
+    Interpolate the time series.
+
+    Parameters
+    ----------
+    ts: tskit.TimeSeries
+        The time series to interpolate.
+    method: str, optional, default: 'linear'
+        The interpolation method to use. See `pandas.Series.interpolate` for more details.
+    fill_value: float, optional, default: 0.0
+        The value to use for filling missing values. This is only used when `method` is set to 'constant'.
+    inplace: bool, optional, default: False
+        Whether to modify the time series in place.
+    name: str, optional, default: None
+        The name of the interpolated time series. The default is the name of the original TimeSeries with '_interpolated'.
+        This is ignored if `inplace` is True.
+
+    Returns
+    -------
+    tskit.TimeSeries
+        The interpolated time series.
+    """
+    pass
