@@ -1,6 +1,6 @@
 # tskit - Time Series Toolkit
 
-![version-0.0.5](https://img.shields.io/badge/version-0.0.5-blue)
+![version-0.0.6](https://img.shields.io/badge/version-0.0.6-blue)
 ![python->=3.11](https://img.shields.io/badge/python->=3.11-blue?logo=python&logoColor=white)
 [![license-MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/alumik/time-series-toolkit/blob/main/LICENSE)
 
@@ -84,7 +84,7 @@ More Examples:
     - [x] Standardize
     - [x] Seasonal-trend decomposition with LOESS (STL)
     - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Split time series into segments
-    - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Interpolate missing values
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Interpolate missing values
 - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Anomaly/outlier injection
     - [ ] Point-wise outlier
         - [ ] Contextual outlier

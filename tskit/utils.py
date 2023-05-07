@@ -1,4 +1,6 @@
 import re
+import math
+import functools
 import unicodedata
 import pandas as pd
 
@@ -106,3 +108,26 @@ def add_freq_to_datetime_index(idx: pd.DatetimeIndex, freq: str = None, inplace:
     if idx.freq is None:
         raise AttributeError('No discernible frequency found to `idx`. Specify a frequency string with `freq`.')
     return idx
+
+
+def infer_freq_from_index(idx: pd.Index | pd.DatetimeIndex | pd.RangeIndex) -> pd.offsets.BaseOffset | int:
+    """
+    Infer the frequency of a pandas Index.
+
+    Parameters
+    ----------
+    idx: pd.Index or pd.DatetimeIndex or pd.RangeIndex
+        The index to infer the frequency of.
+
+    Returns
+    -------
+    pd.offsets.BaseOffset or int
+        The inferred frequency of the index.
+    """
+    idx = idx.sort_values()
+    diffs = idx[1:] - idx[:-1]
+    if isinstance(idx, pd.DatetimeIndex):
+        freq = diffs.min()
+        return pd.tseries.frequencies.to_offset(freq)
+    gcd = functools.reduce(math.gcd, diffs)
+    return int(gcd)

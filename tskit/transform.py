@@ -11,7 +11,7 @@ def add(
         ts_array: Sequence[tskit.TimeSeries],
         weights: Sequence[float] | None = None,
         standardize_idx: Sequence[int] | None = None,
-        index: pd.DatetimeIndex | pd.RangeIndex | Sequence[int] | None = None,
+        index: pd.DatetimeIndex | pd.RangeIndex | pd.Index | Sequence[int] | np.ndarray | None = None,
         name: str | None = None,
 ) -> tskit.TimeSeries:
     """
@@ -25,7 +25,7 @@ def add(
         The weights to apply to each time series.
     standardize_idx: list of int, optional, default: None
         The indices of the time series to standardize.
-    index: Sequence[int] or pd.DatetimeIndex or pd.RangeIndex, optional, default: None
+    index: Sequence[int] or np.ndarray or pd.DatetimeIndex or pd.RangeIndex or pd.Index, optional, default: None
         The index of the combined time series. If None, the index of the first time series is used.
     name: str, optional, default: None
         The name of the combined time series. If None, the names of the input time series are combined.
@@ -135,6 +135,7 @@ def tile(
         n: int,
         interpolate_method: str = 'linear',
         fill_value: float = 0.0,
+        period_length: int | pd.offsets.BaseOffset | None = None,
         inplace: bool = False,
         name: str | None = None,
 ) -> tskit.TimeSeries:
@@ -151,6 +152,8 @@ def tile(
         The interpolation method to use. See `tskit.transform.interpolate` for more details.
     fill_value: float, optional, default: 0.0
         The value to use for filling missing values. This is only used when `interpolate_method` is set to 'constant'.
+    period_length: int or pd.offsets.BaseOffset, optional, default: None
+        The history period to use for interpolation. This is only used when `method` is set to 'history'.
     inplace: bool, optional, default: False
         Whether to modify the time series in place.
     name: str, optional, default: None
@@ -162,7 +165,7 @@ def tile(
     tskit.TimeSeries
         The tiled time series.
     """
-    ts_ = tskit.transform.interpolate(ts, method=interpolate_method, fill_value=fill_value)
+    ts_ = tskit.transform.interpolate(ts, method=interpolate_method, fill_value=fill_value, period_length=period_length)
     index = tskit.generator.generate_index(start=ts_.index[0], length=len(ts_.index) * n, freq=ts_.freq)
     values = np.tile(ts_.values, n)
     if inplace:
@@ -221,11 +224,12 @@ def interpolate(
         ts: tskit.TimeSeries,
         method: str = 'linear',
         fill_value: float = 0.0,
+        period_length: int | pd.offsets.BaseOffset | None = None,
         inplace: bool = False,
         name: str | None = None,
 ) -> tskit.TimeSeries:
     """
-    Interpolate the time series.
+    Interpolate missing index and values in the time series.
 
     Parameters
     ----------
@@ -235,6 +239,8 @@ def interpolate(
         The interpolation method to use. See `pandas.Series.interpolate` for more details.
     fill_value: float, optional, default: 0.0
         The value to use for filling missing values. This is only used when `method` is set to 'constant'.
+    period_length: int or pandas.offsets.BaseOffset, optional, default: None
+        The history period to use for interpolation. This is only used when `method` is set to 'history'.
     inplace: bool, optional, default: False
         Whether to modify the time series in place.
     name: str, optional, default: None
@@ -246,4 +252,29 @@ def interpolate(
     tskit.TimeSeries
         The interpolated time series.
     """
-    pass
+    series = pd.Series(ts.values.copy(), index=ts.index.copy())
+    new_index = tskit.generator.generate_index(start=ts.index[0], end=ts.index[-1], freq=ts.freq)
+    series = series.reindex(new_index)
+    if method == 'constant':
+        series = series.fillna(fill_value)
+    elif method == 'history':
+        if isinstance(period_length, int):
+            series = series.fillna(series.shift(periods=period_length))
+        elif isinstance(period_length, pd.offsets.BaseOffset):
+            series = series.fillna(series.shift(freq=period_length))
+        else:
+            raise ValueError(
+                'A valid `period_length` must be provided when using the `history` method. '
+                f'Got {period_length}.'
+            )
+    else:
+        series = series.interpolate(method=method)
+    if inplace:
+        ts.index = type(ts.index)(series.index)
+        ts.values = series.values
+        return ts
+    return tskit.TimeSeries(
+        index=type(ts.index)(series.index),
+        values=series.values,
+        name=f'{ts.name}_interpolated' if name is None else name,
+    )

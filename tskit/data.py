@@ -16,7 +16,7 @@ class TimeSeries:
 
     def __init__(
             self,
-            index: Sequence[int] | pd.RangeIndex | pd.DatetimeIndex,
+            index: Sequence[int] | np.ndarray | pd.RangeIndex | pd.DatetimeIndex | pd.Index,
             values: Sequence,
             name: str | None = None,
     ):
@@ -25,7 +25,7 @@ class TimeSeries:
 
         Parameters
         ----------
-        index: Sequence[int] or pd.RangeIndex or pd.DatetimeIndex
+        index: Sequence[int] or np.ndarray or pd.RangeIndex or pd.DatetimeIndex or pd.Index
             The index of the time series.
         values: Sequence
             The values of the time series.
@@ -42,13 +42,17 @@ class TimeSeries:
             arg_sorted = np.argsort(index)
             self.index = index[arg_sorted]
             self.values = self.values[arg_sorted]
-        elif isinstance(index, Sequence) and all([isinstance(i, int) for i in index]):
+        elif isinstance(index, Sequence | pd.Index | np.ndarray) and all(
+                [isinstance(i, int | np.int32) for i in index]):
             index = pd.Index(index)
             arg_sorted = np.argsort(index)
             self.index = index[arg_sorted]
             self.values = self.values[arg_sorted]
         else:
-            raise TypeError('Index must be a pd.RangeIndex, pd.DatetimeIndex or Sequence of integers.')
+            raise TypeError(
+                'Index must be a pd.RangeIndex, pd.DatetimeIndex, pd.Index, np.ndarray or Sequence of integers. '
+                f'Got {type(index)} instead.'
+            )
         self.name = name or str(uuid.uuid4())
 
         if isinstance(self.index, pd.DatetimeIndex):
@@ -58,14 +62,8 @@ class TimeSeries:
         else:
             self.freq = None
         if self.freq is None:
-            diffs = self.index[1:] - self.index[:-1]
-            self.freq = diffs.min()
             # TODO: How to check if the index of a `pd.DatetimeIndex is regularly spaced?
-            if isinstance(self.index, pd.DatetimeIndex):
-                self.freq = pd.tseries.frequencies.to_offset(self.freq)
-            else:
-                if not all(i % self.freq == 0 for i in self.index):
-                    raise ValueError('`index` must be regularly spaced.')
+            self.freq = tskit.utils.infer_freq_from_index(self.index)
 
     @classmethod
     def from_generators(
@@ -264,7 +262,13 @@ class TimeSeries:
         """
         return tskit.transform.standardize(self, mean=mean, std=std, inplace=True)
 
-    def tile(self, n: int) -> Self:
+    def tile(
+            self,
+            n: int,
+            interpolate_method: str = 'linear',
+            fill_value: float = 0.0,
+            period_length: int | pd.offsets.BaseOffset | None = None,
+    ) -> Self:
         """
         Tile the time series n times.
 
@@ -272,12 +276,26 @@ class TimeSeries:
         ----------
         n: int
             The number of times to tile the time series.
+        interpolate_method: str, optional, default: 'linear'
+            The interpolation method to use. See `tskit.transform.interpolate` for more details.
+        fill_value: float, optional, default: 0.0
+            The value to use for filling missing values. This is only used when `interpolate_method` is set to 'constant'.
+        period_length: int or pd.offsets.BaseOffset, optional, default: None
+            The history period to use for interpolation. This is only used when `method` is set to 'history'.
 
         Returns
         -------
         tskit.TimeSeries
+            The tiled time series.
         """
-        return tskit.transform.tile(self, n=n, inplace=True)
+        return tskit.transform.tile(
+            self,
+            n=n,
+            interpolate_method=interpolate_method,
+            fill_value=fill_value,
+            period_length=period_length,
+            inplace=True,
+        )
 
     def save(self, path: str | None = None, save_format: str = 'csv', **kwargs):
         """
@@ -311,7 +329,7 @@ class TimeSeries:
             ax: plt.Axes | None = None,
             tight_layout: bool = True,
             show: bool = True,
-            figsize: tuple[int] = (12, 2),
+            figsize: tuple[float, float] = (12, 2),
             title: str | None = None,
             **kwargs,
     ):
@@ -339,6 +357,37 @@ class TimeSeries:
                 Additional keyword arguments to pass to the plotting function.
             """
         tskit.plot(self, ax=ax, tight_layout=tight_layout, show=show, figsize=figsize, title=title, **kwargs)
+
+    def interpolate(
+            self,
+            method: str = 'linear',
+            fill_value: float = 0.0,
+            period_length: int | pd.offsets.BaseOffset | None = None,
+    ) -> Self:
+        """
+        Interpolate missing index and values in the time series.
+
+        Parameters
+        ----------
+        method: str, optional, default: 'linear'
+            The interpolation method to use. See `pandas.Series.interpolate` for more details.
+        fill_value: float, optional, default: 0.0
+            The value to use for filling missing values. This is only used when `method` is set to 'constant'.
+        period_length: int or pandas.offsets.BaseOffset, optional, default: None
+            The history period to use for interpolation. This is only used when `method` is set to 'history'.
+
+        Returns
+        -------
+        tskit.TimeSeries
+            The interpolated time series.
+        """
+        return tskit.transform.interpolate(
+            self,
+            method=method,
+            fill_value=fill_value,
+            period_length=period_length,
+            inplace=True,
+        )
 
     def __len__(self) -> int:
         return len(self.values)

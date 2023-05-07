@@ -10,7 +10,7 @@ def plot(
         ax: plt.Axes | None = None,
         tight_layout: bool = True,
         show: bool = True,
-        figsize: tuple[int, int] = (12, 2),
+        figsize: tuple[float, float] = (12, 2),
         title: str | None = None,
         **kwargs,
 ):
@@ -59,7 +59,7 @@ def _plot_univariate_time_series(
         ax: plt.Axes | None = None,
         tight_layout: bool = True,
         show: bool = True,
-        figsize: tuple[int, int] = (12, 2),
+        figsize: tuple[float, float] = (12, 2),
         title: str | None = None,
         **kwargs,
 ):
