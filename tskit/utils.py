@@ -1,5 +1,6 @@
 import re
 import unicodedata
+import pandas as pd
 
 from typing import Callable
 
@@ -20,7 +21,7 @@ def slugify(value: str, allow_unicode: bool = False) -> str:
     Returns
     -------
     str
-        The slugified string.
+        The converted string.
     """
     value = str(value)
     if allow_unicode:
@@ -74,3 +75,34 @@ def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type:
     if isinstance(identifier, tskit.generator.TimeSeriesGenerator):
         return identifier
     return all_objs.setdefault(obj_type, {}).get(identifier)
+
+
+def add_freq_to_datetime_index(idx: pd.DatetimeIndex, freq: str = None, inplace: bool = False) -> pd.DatetimeIndex:
+    """
+    Add a frequency to a pandas DatetimeIndex.
+
+    Parameters
+    ----------
+    idx: pd.DatetimeIndex
+        The DatetimeIndex to add a frequency to.
+    freq: str, optional, default: None
+        The frequency to add to the DatetimeIndex. If None, the frequency will be inferred.
+    inplace: bool, optional, default: False
+        Whether to modify the DatetimeIndex inplace.
+
+    Returns
+    -------
+    pd.DatetimeIndex
+        The DatetimeIndex with a frequency. It is
+    """
+    if not inplace:
+        idx = idx.copy()
+    if freq is None:
+        if idx.freq is None:
+            freq = pd.infer_freq(idx)
+        else:
+            return idx
+    idx.freq = pd.tseries.frequencies.to_offset(freq)
+    if idx.freq is None:
+        raise AttributeError('No discernible frequency found to `idx`. Specify a frequency string with `freq`.')
+    return idx

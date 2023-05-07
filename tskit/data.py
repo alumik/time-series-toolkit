@@ -32,24 +32,40 @@ class TimeSeries:
         name: str, optional, default: None
             The name of the time series.
         """
-        if isinstance(index, pd.RangeIndex) or isinstance(index, pd.DatetimeIndex):
-            self.index = index
-        elif isinstance(index, Sequence) and all([isinstance(i, int) for i in index]):
-            self.index = pd.Index(index)
-        else:
-            raise TypeError('Index must be a pd.RangeIndex, pd.DatetimeIndex or Sequence.')
+        if len(index) != len(values):
+            raise ValueError('Length of `index` and `values` must be the same.')
+
         self.values = np.asarray(values)
+        if isinstance(index, pd.RangeIndex):
+            self.index = index
+        elif isinstance(index, pd.DatetimeIndex):
+            arg_sorted = np.argsort(index)
+            self.index = index[arg_sorted]
+            self.values = self.values[arg_sorted]
+        elif isinstance(index, Sequence) and all([isinstance(i, int) for i in index]):
+            index = pd.Index(index)
+            arg_sorted = np.argsort(index)
+            self.index = index[arg_sorted]
+            self.values = self.values[arg_sorted]
+        else:
+            raise TypeError('Index must be a pd.RangeIndex, pd.DatetimeIndex or Sequence of integers.')
         self.name = name or str(uuid.uuid4())
 
-        if len(self.index) != len(self.values):
-            raise ValueError('Length of index and values must be the same.')
-
-        if isinstance(index, pd.DatetimeIndex):
-            self.freq = index.freq
-        elif isinstance(index, pd.RangeIndex):
-            self.freq = index.step
+        if isinstance(self.index, pd.DatetimeIndex):
+            self.freq = self.index.freq
+        elif isinstance(self.index, pd.RangeIndex):
+            self.freq = self.index.step
         else:
             self.freq = None
+        if self.freq is None:
+            diffs = self.index[1:] - self.index[:-1]
+            self.freq = diffs.min()
+            # TODO: How to check if the index of a `pd.DatetimeIndex is regularly spaced?
+            if isinstance(self.index, pd.DatetimeIndex):
+                self.freq = pd.tseries.frequencies.to_offset(self.freq)
+            else:
+                if not all(i % self.freq == 0 for i in self.index):
+                    raise ValueError('`index` must be regularly spaced.')
 
     @classmethod
     def from_generators(
