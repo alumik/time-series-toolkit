@@ -1,7 +1,5 @@
 import numpy as np
 
-from typing import Sequence
-
 import tskit
 
 
@@ -10,8 +8,9 @@ def add_gaussian_noise(
         mean: float = 0.0,
         std: float = 1.0,
         amplitude: float = 0.1,
-        clip: Sequence[float] | None = None,
+        clip: tuple[float, float] | None = None,
         inplace: bool = False,
+        name: str | None = None,
 ) -> tskit.TimeSeries:
     """
     Add Gaussian noise to a TimeSeries.
@@ -30,6 +29,9 @@ def add_gaussian_noise(
         The lower and upper bounds to clip the noise to.
     inplace: bool, optional, default: False
         Whether to add the noise in place.
+    name: str, optional, default: None
+        The name of the new TimeSeries. The default is the name of the original TimeSeries with '_gaussian_noise'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
@@ -45,7 +47,7 @@ def add_gaussian_noise(
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=ts.values + noise,
-        name=ts.name + '_gaussian_noise',
+        name=f'{ts.name}_gaussian_noise' if name is None else name,
     )
 
 
@@ -55,6 +57,7 @@ def add_uniform_noise(
         high: float = 1.0,
         amplitude: float = 0.1,
         inplace: bool = False,
+        name: str | None = None,
 ) -> tskit.TimeSeries:
     """
     Add uniform noise to a TimeSeries.
@@ -71,6 +74,9 @@ def add_uniform_noise(
         The amplitude of the noise.
     inplace: bool, optional, default: False
         Whether to add the noise in place.
+    name: str, optional, default: None
+        The name of the new TimeSeries. The default is the name of the original TimeSeries with '_uniform_noise'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
@@ -84,7 +90,7 @@ def add_uniform_noise(
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=ts.values + noise,
-        name=ts.name + '_uniform_noise',
+        name=f'{ts.name}_uniform_noise' if name is None else name,
     )
 
 
@@ -97,8 +103,9 @@ def add_perlin_noise(
         factor_e: float = 1.0,
         factor_pi: float = 1.0,
         amplitude: float = 0.1,
-        clip: Sequence[float] | None = None,
+        clip: tuple[float, float] | None = None,
         inplace: bool = False,
+        name: str | None = None,
 ) -> tskit.TimeSeries:
     """
     Add Perlin noise to a TimeSeries.
@@ -126,6 +133,9 @@ def add_perlin_noise(
         The lower and upper bounds to clip the noise to.
     inplace: bool, optional, default: False
         Whether to add the noise in place.
+    name: str, optional, default: None
+        The name of the new TimeSeries. The default is the name of the original TimeSeries with '_perlin_noise'.
+        This is ignored if `inplace` is True.
 
     Returns
     -------
@@ -143,5 +153,5 @@ def add_perlin_noise(
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=ts.values + noise,
-        name=ts.name + '_perlin_noise',
+        name=f'{ts.name}_perlin_noise' if name is None else name,
     )
