@@ -2,7 +2,7 @@ import re
 import unicodedata
 import pandas as pd
 
-from typing import Callable
+from typing import Callable, Any
 
 import tskit
 
@@ -36,14 +36,14 @@ def slugify(value: str, allow_unicode: bool = False) -> str:
     return re.sub(r'[-\s]+', '-', value).strip('-_')
 
 
-def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type: str) -> Callable:
+def deserialize(identifier: Any, obj_type: str) -> Callable:
     """
     Deserialize an object from a string identifier.
 
     Parameters
     ----------
-    identifier: str | tskit.generator.TimeSeriesGenerator
-        The identifier of the object to deserialize.
+    identifier: any
+        The identifier of the object to deserialize. If the identifier is already an object, it will be returned directly.
     obj_type: str
         The type of the object to deserialize. Must be one of 'generator', 'smoother', or 'noise'.
 
@@ -72,9 +72,9 @@ def deserialize(identifier: str | tskit.generator.TimeSeriesGenerator, obj_type:
             'perlin': tskit.noise.add_perlin_noise,
         }
     }
-    if isinstance(identifier, tskit.generator.TimeSeriesGenerator):
-        return identifier
-    return all_objs.setdefault(obj_type, {}).get(identifier)
+    if isinstance(identifier, str):
+        return all_objs.setdefault(obj_type, {}).get(identifier)
+    return identifier
 
 
 def add_freq_to_datetime_index(idx: pd.DatetimeIndex, freq: str = None, inplace: bool = False) -> pd.DatetimeIndex:
