@@ -168,6 +168,107 @@ class TimeSeries:
             **config,
         )
 
+    @classmethod
+    def from_dataframe(
+            cls,
+            df: pd.DataFrame,
+            timestamp_col: str | None = 'timestamp',
+            value_col: str | None = 'value',
+            to_datetime: bool = False,
+            timestamp_unit: str | None = None,
+            name: str | None = None,
+    ) -> Self:
+        """
+        Generate a time series from a pandas DataFrame.
+
+        Parameters
+        ----------
+        df: pd.DataFrame
+            The DataFrame to read.
+        timestamp_col: str, optional, default: 'timestamp'
+            The name of the column containing the timestamps.
+        value_col: str, optional, default: 'value'
+            The name of the column containing the values.
+        to_datetime: bool, optional, default: False
+            Whether to convert the timestamps to pd.DatetimeIndex.
+        timestamp_unit: str, optional, default: None
+            The unit of the timestamps. If None, the unit will be defaulted to milliseconds.
+        name: str, optional, default: None
+            The name of the time series. If not specified, a random UUID will be used.
+
+        Returns
+        -------
+        tskit.TimeSeries
+            The generated time series.
+        """
+        if timestamp_col not in df.columns:
+            raise ValueError(f'Column "{timestamp_col}" not found in DataFrame.')
+        if value_col not in df.columns:
+            raise ValueError(f'Column "{value_col}" not found in DataFrame.')
+        if to_datetime:
+            index = pd.DatetimeIndex(pd.to_datetime(df[timestamp_col], unit=timestamp_unit))
+        else:
+            index = pd.Index(df[timestamp_col])
+        df = df.set_index(index)
+        return cls(
+            index=index,
+            values=df[value_col],
+            name=name,
+        )
+
+    @classmethod
+    def from_csv(
+            cls,
+            filepath_or_buffer: Any,
+            timestamp_col: str | None = 'timestamp',
+            value_col: str | None = 'value',
+            to_datetime: bool = False,
+            timestamp_unit: str | None = None,
+            name: str | None = None,
+            **kwargs,
+    ) -> Self:
+        """
+        Generate a time series from a CSV file.
+
+        Parameters
+        ----------
+        filepath_or_buffer: str or file-like object
+            The CSV file to read.
+        timestamp_col: str, optional, default: 'timestamp'
+            The name of the column containing the timestamps.
+        value_col: str, optional, default: 'value'
+            The name of the column containing the values.
+        to_datetime: bool, optional, default: False
+            Whether to convert the timestamps to pd.DatetimeIndex.
+        timestamp_unit: str, optional, default: None
+            The unit of the timestamps. If None, the unit will be defaulted to milliseconds.
+        name: str, optional, default: None
+            The name of the time series.
+            If not specified, the filename without extension will be used.
+            If no filename can be determined, a random UUID will be used.
+
+        Returns
+        -------
+        tskit.TimeSeries
+            The generated time series.
+
+        Other Parameters
+        ----------------
+        kwargs: dict
+            Additional keyword arguments to pass to `pd.read_csv`.
+        """
+        if isinstance(filepath_or_buffer, str | pathlib.Path) and name is None:
+            name = pathlib.Path(filepath_or_buffer).stem
+        df = pd.read_csv(filepath_or_buffer, **kwargs)
+        return cls.from_dataframe(
+            df=df,
+            timestamp_col=timestamp_col,
+            value_col=value_col,
+            to_datetime=to_datetime,
+            timestamp_unit=timestamp_unit,
+            name=name,
+        )
+
     def to_shapelet(self, alpha: float = 1.0) -> Self:
         """
         Convert the time series to a shapelet.

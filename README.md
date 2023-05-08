@@ -1,6 +1,6 @@
 # tskit - Time Series Toolkit
 
-![version-0.0.6](https://img.shields.io/badge/version-0.0.6-blue)
+![version-0.0.7](https://img.shields.io/badge/version-0.0.7-blue)
 ![python->=3.11](https://img.shields.io/badge/python->=3.11-blue?logo=python&logoColor=white)
 [![license-MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/alumik/time-series-toolkit/blob/main/LICENSE)
 
@@ -35,19 +35,11 @@ ts.save('out/uts.csv')
 tskit.plot(ts)
 ```
 
-More Examples:
-
-- [Generate time series](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/generate_time_series.ipynb)
-- [Generate time series (step-by-step)](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/generate_time_series_step_by_step.ipynb)
-- [Time series generators](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/time_series_generators.ipynb)
-- [Smoothing methods](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/smoothing_methods.ipynb)
-- [Merge time series](https://github.com/alumik/time-series-toolkit/blob/master/notebooks/merge_time_series.ipynb)
-
 ## Tools
 
 - [x] Time series generation
-    - [x] Infer the frequency of time series
-    - [x] From configs
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Infer the frequency of time series
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) From configs
     - [x] From generators
         - [x] Random walk
         - [x] Sine
@@ -65,7 +57,8 @@ More Examples:
         - [x] Triangle
         - [x] Impulse
         - [x] Perlin
-    - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) From existing time series samples
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) From Pandas DataFrames
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) From CSV files
 - [x] Add noise to time series
     - [x] Gaussian noise
     - [x] Uniform noise

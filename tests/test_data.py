@@ -80,3 +80,16 @@ class TestGenerator(unittest.TestCase):
         )
         np.testing.assert_array_equal([1, 0, 2], ts.values)
         self.assertEqual(pd.offsets.Day(1), ts.freq)
+
+    def test_time_series_from_csv_integer_index(self):
+        ts = tskit.TimeSeries.from_csv('data/test_time_series_from_csv_integer_index.csv', )
+        self.assertEqual([1, 2, 3, 5], list(ts.index))
+        np.testing.assert_array_equal([100, 200, 300, 500], ts.values)
+
+    def test_time_series_from_csv_datetime_index(self):
+        ts = tskit.TimeSeries.from_csv(
+            'data/test_time_series_from_csv_datetime_index.csv',
+            to_datetime=True,
+            timestamp_unit='s',
+        )
+        ts.plot()
