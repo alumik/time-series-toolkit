@@ -68,7 +68,7 @@ class TimeSeries:
     @classmethod
     def from_generators(
             cls,
-            generators: Sequence[Union[str, 'tskit.generator.TimeSeriesGenerator']],
+            generators: Sequence[Union[str, 'tskit.generators.TimeSeriesGenerator']],
             generator_args: Sequence[dict] | None = None,
             weights: Sequence[float] | None = None,
             standardize_idx: Sequence[int] | None = None,
@@ -84,7 +84,7 @@ class TimeSeries:
 
         Parameters
         ----------
-        generators: list of str or list of tskit.generator.TimeSeriesGenerator
+        generators: list of str or list of tskit.generators.TimeSeriesGenerator
             The generators to use.
         generator_args: list of dict, optional, default: None
             The generator specific arguments to pass to the generators.

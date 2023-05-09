@@ -55,7 +55,7 @@ class RandomWalkGenerator(TimeSeriesGenerator):
         self.std = std
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.random_walk(**{'mean': self.mean, 'std': self.std, **kwargs})
+        return tskit.generators.random_walk(**{'mean': self.mean, 'std': self.std, **kwargs})
 
 
 class SineGenerator(TimeSeriesGenerator):
@@ -74,7 +74,7 @@ class SineGenerator(TimeSeriesGenerator):
         self.phase = phase
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.sine(**{
+        return tskit.generators.sine(**{
             'amplitude': self.amplitude,
             'period': self.period,
             'phase': self.phase,
@@ -98,7 +98,7 @@ class CosineGenerator(TimeSeriesGenerator):
         self.phase = phase
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.cosine(**{
+        return tskit.generators.cosine(**{
             'amplitude': self.amplitude,
             'period': self.period,
             'phase': self.phase,
@@ -120,7 +120,7 @@ class LinearGenerator(TimeSeriesGenerator):
         self.intercept = intercept
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.linear(**{
+        return tskit.generators.linear(**{
             'slope': self.slope,
             'intercept': self.intercept,
             **kwargs,
@@ -141,7 +141,7 @@ class GaussianGenerator(TimeSeriesGenerator):
         self.std = std
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.gaussian(**{
+        return tskit.generators.gaussian(**{
             'mean': self.mean,
             'std': self.std,
             **kwargs,
@@ -162,7 +162,7 @@ class UniformGenerator(TimeSeriesGenerator):
         self.high = high
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.uniform(**{
+        return tskit.generators.uniform(**{
             'low': self.low,
             'high': self.high,
             **kwargs,
@@ -183,7 +183,7 @@ class StepGenerator(TimeSeriesGenerator):
         self.delta = delta
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.step(**{
+        return tskit.generators.step(**{
             'step_size': self.step_size,
             'delta': self.delta,
             **kwargs,
@@ -202,7 +202,7 @@ class ExponentialGenerator(TimeSeriesGenerator):
         self.scale = scale
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.exponential(**{
+        return tskit.generators.exponential(**{
             'scale': self.scale,
             **kwargs,
         })
@@ -220,7 +220,7 @@ class PoissonGenerator(TimeSeriesGenerator):
         self.lam = lam
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.poisson(**{
+        return tskit.generators.poisson(**{
             'lam': self.lam,
             **kwargs,
         })
@@ -240,7 +240,7 @@ class LogNormalGenerator(TimeSeriesGenerator):
         self.std = std
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.log_normal(**{
+        return tskit.generators.log_normal(**{
             'mean': self.mean,
             'std': self.std,
             **kwargs,
@@ -261,7 +261,7 @@ class GammaGenerator(TimeSeriesGenerator):
         self.scale = scale
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.gamma(**{
+        return tskit.generators.gamma(**{
             'shape': self.shape,
             'scale': self.scale,
             **kwargs,
@@ -282,7 +282,7 @@ class SquareGenerator(TimeSeriesGenerator):
         self.period = period
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.square(**{
+        return tskit.generators.square(**{
             'amplitude': self.amplitude,
             'period': self.period,
             **kwargs,
@@ -303,7 +303,7 @@ class SawtoothGenerator(TimeSeriesGenerator):
         self.period = period
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.sawtooth(**{
+        return tskit.generators.sawtooth(**{
             'amplitude': self.amplitude,
             'period': self.period,
             **kwargs,
@@ -324,7 +324,7 @@ class TriangleGenerator(TimeSeriesGenerator):
         self.period = period
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.triangle(**{
+        return tskit.generators.triangle(**{
             'amplitude': self.amplitude,
             'period': self.period,
             **kwargs,
@@ -347,7 +347,7 @@ class ImpulseGenerator(TimeSeriesGenerator):
         self.impulse_time = impulse_time
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.impulse(**{
+        return tskit.generators.impulse(**{
             'base': self.base,
             'impulse_size': self.impulse_size,
             'impulse_time': self.impulse_time,
@@ -379,7 +379,7 @@ class PerlinGenerator(TimeSeriesGenerator):
         self.factor_pi = factor_pi
 
     def call(self, **kwargs) -> tskit.TimeSeries:
-        return tskit.generator.perlin(**{
+        return tskit.generators.perlin(**{
             'amplitude': self.amplitude,
             'alpha': self.alpha,
             'beta': self.beta,

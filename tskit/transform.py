@@ -166,7 +166,7 @@ def tile(
         The tiled time series.
     """
     ts_ = tskit.transform.interpolate(ts, method=interpolate_method, fill_value=fill_value, period_length=period_length)
-    index = tskit.generator.generate_index(start=ts_.index[0], length=len(ts_.index) * n, freq=ts_.freq)
+    index = tskit.generators.generate_index(start=ts_.index[0], length=len(ts_.index) * n, freq=ts_.freq)
     values = np.tile(ts_.values, n)
     if inplace:
         ts.index = index
@@ -253,7 +253,7 @@ def interpolate(
         The interpolated time series.
     """
     series = pd.Series(ts.values.copy(), index=ts.index.copy())
-    new_index = tskit.generator.generate_index(start=ts.index[0], end=ts.index[-1], freq=ts.freq)
+    new_index = tskit.generators.generate_index(start=ts.index[0], end=ts.index[-1], freq=ts.freq)
     series = series.reindex(new_index)
     if method == 'constant':
         series = series.fillna(fill_value)

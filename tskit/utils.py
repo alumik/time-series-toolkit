@@ -57,7 +57,7 @@ def deserialize(identifier: Any, obj_type: str) -> Callable:
     all_objs = {
         'generator': {
             generator.method: generator
-            for generator in tskit.generator.TimeSeriesGenerator.__subclasses__()
+            for generator in tskit.generators.TimeSeriesGenerator.__subclasses__()
         },
         'smoother': {
             'moving_average': tskit.smoothing.moving_average,
