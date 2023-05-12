@@ -42,7 +42,7 @@ def add_gaussian_noise(
     if clip is not None:
         noise = np.clip(noise, *clip)
     if inplace:
-        ts.values += noise
+        ts += noise
         return ts
     return tskit.TimeSeries(
         index=ts.index.copy(),
@@ -85,7 +85,7 @@ def add_uniform_noise(
     """
     noise = amplitude * np.random.uniform(low, high, size=len(ts))
     if inplace:
-        ts.values += noise
+        ts += noise
         return ts
     return tskit.TimeSeries(
         index=ts.index.copy(),
@@ -148,7 +148,7 @@ def add_perlin_noise(
     if clip is not None:
         noise = np.clip(noise, *clip)
     if inplace:
-        ts.values += noise
+        ts += noise
         return ts
     return tskit.TimeSeries(
         index=ts.index.copy(),

@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import uuid
 import pathlib
+import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from typing import Sequence, Union, Self, Any
+from numpy import typing as npt
+from typing import Iterable, Sequence, Callable, Self, Any
 
 import tskit
 
@@ -12,12 +16,13 @@ import tskit
 class TimeSeries:
     """
     TimeSeries class for time series data.
+    It is a wrapper around a pandas Series.
     """
 
     def __init__(
             self,
-            index: Sequence[int] | np.ndarray | pd.RangeIndex | pd.DatetimeIndex | pd.Index,
-            values: Sequence,
+            index: npt.ArrayLike,
+            values: npt.ArrayLike,
             name: str | None = None,
     ):
         """
@@ -25,57 +30,47 @@ class TimeSeries:
 
         Parameters
         ----------
-        index: Sequence[int] or np.ndarray or pd.RangeIndex or pd.DatetimeIndex or pd.Index
+        index: array-like
             The index of the time series.
-        values: Sequence
+        values: array-like
             The values of the time series.
         name: str, optional, default: None
             The name of the time series.
+            If None, a random UUID is generated.
         """
         if len(index) != len(values):
-            raise ValueError('Length of `index` and `values` must be the same.')
+            raise ValueError('`index` and `values` must be of equal length.')
 
-        self.values = np.asarray(values)
-        if isinstance(index, pd.RangeIndex):
-            self.index = index
-        elif isinstance(index, pd.DatetimeIndex):
-            arg_sorted = np.argsort(index)
-            self.index = index[arg_sorted]
-            self.values = self.values[arg_sorted]
-        elif isinstance(index, Sequence | pd.Index | np.ndarray) and all(
-                [isinstance(i, int | np.int32) for i in index]):
-            index = pd.Index(index)
-            arg_sorted = np.argsort(index)
-            self.index = index[arg_sorted]
-            self.values = self.values[arg_sorted]
-        else:
-            raise TypeError(
-                'Index must be a pd.RangeIndex, pd.DatetimeIndex, pd.Index, np.ndarray or Sequence of integers. '
-                f'Got {type(index)} instead.'
-            )
+        self._ts = pd.Series(values, index=index)
+        self._ts.sort_index(inplace=True)
         self.name = name or str(uuid.uuid4())
+        self.freq = tskit.utils.infer_freq(self._ts.index)
 
-        if isinstance(self.index, pd.DatetimeIndex):
-            self.freq = self.index.freq
-        elif isinstance(self.index, pd.RangeIndex):
-            self.freq = self.index.step
-        else:
-            self.freq = None
-        if self.freq is None:
-            # TODO: How to check if the index of a `pd.DatetimeIndex is regularly spaced?
-            self.freq = tskit.utils.infer_freq_from_index(self.index)
+    @property
+    def index(self) -> pd.Index | pd.RangeIndex | pd.DatetimeIndex:
+        """
+        The index of the time series.
+        """
+        return self._ts.index
+
+    @property
+    def values(self) -> np.ndarray:
+        """
+        The values of the time series.
+        """
+        return self._ts.to_numpy()
 
     @classmethod
     def from_generators(
             cls,
-            generators: Sequence[Union[str, 'tskit.generators.TimeSeriesGenerator']],
-            generator_args: Sequence[dict] | None = None,
+            generators: Sequence[str | Callable[..., tskit.TimeSeries]],
+            generator_args: Sequence[dict[str, Any]] | None = None,
             weights: Sequence[float] | None = None,
-            standardize_idx: Sequence[int] | None = None,
-            start: pd.Timestamp | int | None = 0,
-            end: pd.Timestamp | int | None = None,
+            standardize_idx: Iterable[int] | None = None,
+            start: int | datetime.datetime | None = 0,
+            end: int | datetime.datetime | None = None,
             length: int | None = None,
-            freq: str | int | None = None,
+            freq: int | str | pd.offsets.BaseOffset | None = None,
             name: str | None = None,
             dtype: np.dtype = np.float64,
     ) -> Self:
@@ -84,27 +79,34 @@ class TimeSeries:
 
         Parameters
         ----------
-        generators: list of str or list of tskit.generators.TimeSeriesGenerator
+        generators: sequence of str or callable
             The generators to use.
-        generator_args: list of dict, optional, default: None
-            The generator specific arguments to pass to the generators.
-        weights: list of float, optional, default: None
+        generator_args: sequence of dict, optional, default: None
+            The generator specific arguments to pass to each generator.
+            If not None, the length of this sequence must match the length of `generators`.
+        weights: sequence of float, optional, default: None
             The weights to use for combining the generators.
-        standardize_idx: list of int, optional, default: None
+            If not None, the length of this sequence must match the length of `generators`.
+        standardize_idx: iterable of int, optional, default: None
             The indices of the generators to standardize.
-        start: pd.Timestamp or int, optional, default: 0
-            The start index of the time series. If a pd.Timestamp is provided, the index will be a pd.DatetimeIndex.
+        start: int or datetime, optional, default: 0
+            The start index of the time series.
+            If a datetime is provided, the index will be a pd.DatetimeIndex.
             If an int is provided, the index will be a pd.RangeIndex.
-        end: pd.Timestamp or int, optional, default: None
+            For generating an index with `end` and `length`, please consider setting `start` to None.
+        end: int or datetime, optional, default: None
             The end index of the time series.
         length: int, optional, default: None
-            The length of the time series. Exactly two of `start`, `end`, `length` must be specified.
-            For generating an index with `end` and `length` consider setting `start` to None.
-        freq: str or int, optional, default: None
-            The frequency of the time series. If the index is pd.DatetimeIndex, this must be a valid frequency string.
+            The length of the time series.
+            Exactly two of `start`, `end`, and `length` must be specified.
+        freq: int or str or pd.offsets.BaseOffset, optional, default: None
+            The frequency of the time series.
+            If the index is pd.DatetimeIndex, this must be a valid frequency string or a pd.offsets.BaseOffset.
             If the index is pd.RangeIndex, this must be an integer.
+            The default is 's' (seconds) for pd.DatetimeIndex and 1 for pd.RangeIndex.
         name: str, optional, default: None
-            The name of the time series. If not specified, a random UUID will be used.
+            The name of the time series.
+            If None, a random UUID is generated.
         dtype: np.dtype, optional, default: np.float64
             The dtype of the values.
 
@@ -124,7 +126,7 @@ class TimeSeries:
         generator_objs = [tskit.utils.deserialize(g, obj_type='generator') for g in generators]
         if unknown_generators := [g for obj, g in zip(generator_objs, generators) if obj is None]:
             raise ValueError(f'Unknown generators: {unknown_generators}.')
-        if len(generator_objs) == 0:
+        if not generator_objs:
             raise ValueError('At least one generator must be specified.')
         if generator_args is None:
             generator_args = [{} for _ in range(len(generator_objs))]
@@ -172,8 +174,8 @@ class TimeSeries:
     def from_dataframe(
             cls,
             df: pd.DataFrame,
-            timestamp_col: str | None = 'timestamp',
-            value_col: str | None = 'value',
+            index_col: str = 'timestamp',
+            value_col: str = 'value',
             to_datetime: bool = False,
             timestamp_unit: str | None = None,
             name: str | None = None,
@@ -183,36 +185,37 @@ class TimeSeries:
 
         Parameters
         ----------
-        df: pd.DataFrame
-            The DataFrame to read.
-        timestamp_col: str, optional, default: 'timestamp'
-            The name of the column containing the timestamps.
+        df: pandas.DataFrame
+            The DataFrame to use.
+        index_col: str, optional, default: 'timestamp'
+            The name of the column to use as index.
         value_col: str, optional, default: 'value'
-            The name of the column containing the values.
+            The name of the column to use as values.
         to_datetime: bool, optional, default: False
-            Whether to convert the timestamps to pd.DatetimeIndex.
+            Whether to convert the index to a pd.DatetimeIndex.
         timestamp_unit: str, optional, default: None
-            The unit of the timestamps. If None, the unit will be defaulted to milliseconds.
+            The unit of the timestamp column.
+            If None, the unit will be defaulted to milliseconds.
         name: str, optional, default: None
-            The name of the time series. If not specified, a random UUID will be used.
+            The name of the time series.
+            If None, a random UUID is generated.
 
         Returns
         -------
         tskit.TimeSeries
             The generated time series.
         """
-        if timestamp_col not in df.columns:
-            raise ValueError(f'Column "{timestamp_col}" not found in DataFrame.')
+        if index_col not in df.columns:
+            raise ValueError(f'Column "{index_col}" not found in DataFrame.')
         if value_col not in df.columns:
             raise ValueError(f'Column "{value_col}" not found in DataFrame.')
         if to_datetime:
-            index = pd.DatetimeIndex(pd.to_datetime(df[timestamp_col], unit=timestamp_unit))
+            index = pd.DatetimeIndex(pd.to_datetime(df[index_col], unit=timestamp_unit))
         else:
-            index = pd.Index(df[timestamp_col])
-        df = df.set_index(index)
+            index = pd.Index(df[index_col].to_numpy())
         return cls(
             index=index,
-            values=df[value_col],
+            values=df[value_col].to_numpy(),
             name=name,
         )
 
@@ -220,8 +223,8 @@ class TimeSeries:
     def from_csv(
             cls,
             filepath_or_buffer: Any,
-            timestamp_col: str | None = 'timestamp',
-            value_col: str | None = 'value',
+            index_col: str = 'timestamp',
+            value_col: str = 'value',
             to_datetime: bool = False,
             timestamp_unit: str | None = None,
             name: str | None = None,
@@ -232,20 +235,21 @@ class TimeSeries:
 
         Parameters
         ----------
-        filepath_or_buffer: str or file-like object
+        filepath_or_buffer: str or file-like
             The CSV file to read.
-        timestamp_col: str, optional, default: 'timestamp'
-            The name of the column containing the timestamps.
+        index_col: str, optional, default: 'timestamp'
+            The name of the column to use as index.
         value_col: str, optional, default: 'value'
-            The name of the column containing the values.
+            The name of the column to use as values.
         to_datetime: bool, optional, default: False
-            Whether to convert the timestamps to pd.DatetimeIndex.
+            Whether to convert the index to a pd.DatetimeIndex.
         timestamp_unit: str, optional, default: None
-            The unit of the timestamps. If None, the unit will be defaulted to milliseconds.
+            The unit of the timestamp column.
+            If None, the unit will be defaulted to milliseconds.
         name: str, optional, default: None
             The name of the time series.
-            If not specified, the filename without extension will be used.
-            If no filename can be determined, a random UUID will be used.
+            If None, the filename without extension will be used.
+            If no filename can be determined, a random UUID will be generated.
 
         Returns
         -------
@@ -262,12 +266,61 @@ class TimeSeries:
         df = pd.read_csv(filepath_or_buffer, **kwargs)
         return cls.from_dataframe(
             df=df,
-            timestamp_col=timestamp_col,
+            index_col=index_col,
             value_col=value_col,
             to_datetime=to_datetime,
             timestamp_unit=timestamp_unit,
             name=name,
         )
+
+    def save(self, path: str | None = None, save_format: str = 'csv', **kwargs):
+        """
+        Save the time series to a file.
+
+        Parameters
+        ----------
+        path: str, optional, default: None
+            The path to save the time series to. If None, the time series name will be used.
+        save_format: str, optional, default: 'csv'
+            The format to save the time series in. Only 'csv' are currently supported.
+
+        Other Parameters
+        ----------------
+        **kwargs:
+            Additional keyword arguments to pass to the save method.
+        """
+        if path is None:
+            path = tskit.utils.slugify(self.name) + '.' + save_format
+        path = pathlib.Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        df = pd.DataFrame({'timestamp': self.index, 'value': self.values})
+        match save_format:
+            case 'csv':
+                df.to_csv(path, index=False, **kwargs)
+            case _:
+                raise ValueError(f'Unknown format: {save_format}.')
+
+    def assign(self, values: npt.ArrayLike, index: npt.ArrayLike | None = None):
+        """
+        Set the values of the time series.
+
+        Parameters
+        ----------
+        values: array-like
+            The values to set.
+        index: array-like, optional, default: None
+            The index to set the values at.
+            If None, the current index will be used.
+        """
+        index = index or self.index
+        if len(index) != len(values):
+            raise ValueError('`index` and `values` must be of equal length.')
+
+        self._ts = pd.Series(values, index=index)
+
+        if index is not None:
+            self._ts.sort_index(inplace=True)
+            self.freq = tskit.utils.infer_freq(self._ts.index)
 
     def to_shapelet(self, alpha: float = 1.0) -> Self:
         """
@@ -325,9 +378,9 @@ class TimeSeries:
         Parameters
         ----------
         method: str, optional, default: 'moving_average'
-            The smoothing method to use. ['moving_average', 'median', 'exponential_weighted_moving_average']
-            are currently supported.
-            'ma' is an alias for 'moving_average'. 'ewma' is an alias for 'exponential_weighted_moving_average'.
+            The smoothing method to use.
+            ['moving_average', 'median', 'exponential_weighted_moving_average','savitzky_golay'] are
+            currently supported.
 
         Returns
         -------
@@ -398,33 +451,6 @@ class TimeSeries:
             inplace=True,
         )
 
-    def save(self, path: str | None = None, save_format: str = 'csv', **kwargs):
-        """
-        Save the time series to a file.
-
-        Parameters
-        ----------
-        path: str, optional, default: None
-            The path to save the time series to. If None, the time series name will be used.
-        save_format: str, optional, default: 'csv'
-            The format to save the time series in. Only 'csv' are currently supported.
-
-        Other Parameters
-        ----------------
-        **kwargs:
-            Additional keyword arguments to pass to the save method.
-        """
-        if path is None:
-            path = tskit.utils.slugify(self.name) + '.' + save_format
-        path = pathlib.Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        df = pd.DataFrame({'value': self.values}).set_index(self.index)
-        match save_format:
-            case 'csv':
-                df.to_csv(path, **kwargs)
-            case _:
-                raise ValueError(f'Unknown format: {save_format}.')
-
     def plot(
             self,
             ax: plt.Axes | None = None,
@@ -439,8 +465,6 @@ class TimeSeries:
 
             Parameters
             ----------
-            ts: tskit.TimeSeries
-                The TimeSeries to plot.
             ax: matplotlib.Axes, optional, default: None
                 The axes to plot on. If None, a new figure will be created.
             tight_layout: bool, optional, default: True
@@ -492,3 +516,33 @@ class TimeSeries:
 
     def __len__(self) -> int:
         return len(self.values)
+
+    def __str__(self) -> str:
+        header = f'{self.name} ({self.__class__.__name__})'
+        return header + '\n' + '-' * len(header) + '\n' + str(self._ts) + '\n' + '-' * len(header)
+
+    def __iadd__(self, other: tskit.TimeSeries | npt.ArrayLike) -> Self:
+        if isinstance(other, tskit.TimeSeries):
+            self._ts += other._ts
+        else:
+            self._ts += other
+        return self
+
+    def __isub__(self, other: tskit.TimeSeries | npt.ArrayLike) -> Self:
+        if isinstance(other, tskit.TimeSeries):
+            self._ts -= other._ts
+        else:
+            self._ts -= other
+        return self
+
+    def __imul__(self, other: float) -> Self:
+        self._ts *= other
+        return self
+
+    def __itruediv__(self, other: float) -> Self:
+        self._ts /= other
+        return self
+
+    def __ifloordiv__(self, other: float) -> Self:
+        self._ts //= other
+        return self

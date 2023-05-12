@@ -1,8 +1,8 @@
 # tskit - Time Series Toolkit
 
-![version-0.0.8](https://img.shields.io/badge/version-0.0.8-blue)
+![version-0.0.9](https://img.shields.io/badge/version-0.0.9-blue)
 ![python->=3.11](https://img.shields.io/badge/python->=3.11-blue?logo=python&logoColor=white)
-[![license-MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/alumik/time-series-toolkit/blob/main/LICENSE)
+![license-MIT](https://img.shields.io/badge/license-MIT-green)
 
 `tskit` is a collection of tools for time series data analysis.
 
@@ -38,8 +38,8 @@ tskit.plot(ts)
 ## Tools
 
 - [x] Time series generation
-    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Infer the frequency of time series
-    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) From configs
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/version-v0.1.0-orange) Infer the frequency of time series
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/version-v0.1.0-orange) From configs
     - [x] From generators
         - [x] Random walk
         - [x] Sine
@@ -57,8 +57,8 @@ tskit.plot(ts)
         - [x] Triangle
         - [x] Impulse
         - [x] Perlin
-    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) From Pandas DataFrames
-    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) From CSV files
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/version-v0.1.0-orange) From Pandas DataFrames
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/version-v0.1.0-orange) From CSV files
 - [x] Add noise to time series
     - [x] Gaussian noise
     - [x] Uniform noise
@@ -76,9 +76,9 @@ tskit.plot(ts)
     - [x] Shapelet transform
     - [x] Standardize
     - [x] Seasonal-trend decomposition with LOESS (STL)
-    - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Split time series into segments
-    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Interpolate missing values
-- [ ] ![Planned for v0.1.0](https://img.shields.io/badge/milestone-v0.1.0-orange) Anomaly/outlier injection
+    - [ ] ![Planned for v0.1.0](https://img.shields.io/badge/version-v0.1.0-orange) Split time series into segments
+    - [x] ![Planned for v0.1.0](https://img.shields.io/badge/version-v0.1.0-orange) Interpolate missing values
+- [ ] ![Planned for v0.1.0](https://img.shields.io/badge/version-v0.1.0-orange) Anomaly/outlier injection
     - [ ] Point-wise outlier
         - [ ] Contextual outlier
         - [ ] Global outlier
@@ -86,4 +86,4 @@ tskit.plot(ts)
         - [ ] Shapelet outlier
         - [ ] Trend outlier
         - [ ] Seasonal outlier
-- [ ] ![Planned for v0.2.0](https://img.shields.io/badge/milestone-v0.2.0-green) Support for multivariate time series
+- [ ] ![Planned for v0.2.0](https://img.shields.io/badge/version-v0.2.0-green) Support for multivariate time series

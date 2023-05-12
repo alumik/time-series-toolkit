@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from typing import Sequence
+from numpy import typing as npt
+from typing import Iterable, Sequence
 from statsmodels.tsa.seasonal import STL
 
 import tskit
@@ -10,8 +11,8 @@ import tskit
 def add(
         ts_array: Sequence[tskit.TimeSeries],
         weights: Sequence[float] | None = None,
-        standardize_idx: Sequence[int] | None = None,
-        index: pd.DatetimeIndex | pd.RangeIndex | pd.Index | Sequence[int] | np.ndarray | None = None,
+        standardize_idx: Iterable[int] | None = None,
+        index: npt.ArrayLike | None = None,
         name: str | None = None,
 ) -> tskit.TimeSeries:
     """
@@ -19,16 +20,18 @@ def add(
 
     Parameters
     ----------
-    ts_array: list of tskit.TimeSeries
+    ts_array: sequence of tskit.TimeSeries
         The time series to combine.
-    weights: list of float, optional, default: None
+    weights: sequence of float, optional, default: None
         The weights to apply to each time series.
-    standardize_idx: list of int, optional, default: None
+    standardize_idx: iterable of int, optional, default: None
         The indices of the time series to standardize.
-    index: Sequence[int] or np.ndarray or pd.DatetimeIndex or pd.RangeIndex or pd.Index, optional, default: None
-        The index of the combined time series. If None, the index of the first time series is used.
+    index: array-like, optional, default: None
+        The index of the combined time series.
+        If None, the index of the first time series is used.
     name: str, optional, default: None
-        The name of the combined time series. If None, the names of the input time series are combined.
+        The name of the combined time series.
+        If None, the names of the input time series are combined.
 
     Returns
     -------
@@ -40,7 +43,7 @@ def add(
     if weights is None:
         weights = [1.0] * len(ts_array)
     if len(weights) != len(ts_array):
-        raise ValueError('Length of weights must be the same as length of time series array.')
+        raise ValueError('`weights` and `ts_array` must be of equal length.')
     if standardize_idx is None:
         standardize_idx = []
     if index is None:
@@ -81,7 +84,8 @@ def to_shapelet(
     inplace: bool, optional, default: False
         Whether to modify the time series in place.
     name: str, optional, default: None
-        The name of the shapelet. The default is the name of the original TimeSeries with '_shapelet'.
+        The name of the shapelet.
+        The default is the name of the original TimeSeries with '_shapelet'.
         This is ignored if `inplace` is True.
 
     Returns
@@ -169,8 +173,7 @@ def tile(
     index = tskit.generators.generate_index(start=ts_.index[0], length=len(ts_.index) * n, freq=ts_.freq)
     values = np.tile(ts_.values, n)
     if inplace:
-        ts.index = index
-        ts.values = values
+        ts.assign(values=values, index=index)
         return ts
     return tskit.TimeSeries(index=index, values=values, name=f'{ts_.name}_tiled' if name is None else name)
 
@@ -211,10 +214,10 @@ def standardize(
         std = ts.values.std()
     values = (ts.values - mean) / std
     if inplace:
-        ts.values = values
+        ts.assign(values)
         return ts
     return tskit.TimeSeries(
-        index=ts.index,
+        index=ts.index.copy(),
         values=values,
         name=f'{ts.name}_std' if name is None else name,
     )
@@ -270,11 +273,10 @@ def interpolate(
     else:
         series = series.interpolate(method=method)
     if inplace:
-        ts.index = type(ts.index)(series.index)
-        ts.values = series.values
+        ts.assign(values=series.values, index=series.index)
         return ts
     return tskit.TimeSeries(
-        index=type(ts.index)(series.index),
+        index=series.index,
         values=series.values,
         name=f'{ts.name}_interpolated' if name is None else name,
     )

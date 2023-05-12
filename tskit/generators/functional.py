@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 import pandas as pd
 
@@ -7,11 +8,11 @@ import tskit
 
 
 def generate_index(
-        start: pd.Timestamp | int | None = None,
-        end: pd.Timestamp | int | None = None,
+        start: int | datetime.datetime | None = None,
+        end: int | datetime.datetime | None = None,
         length: int | None = None,
-        freq: str | int | None = None,
-) -> pd.DatetimeIndex | pd.RangeIndex:
+        freq: int | str | pd.offsets.BaseOffset | None = None,
+) -> pd.RangeIndex | pd.DatetimeIndex:
     constructors = [
         arg_name
         for arg, arg_name in zip([start, end, length], ['start', 'end', 'length'])
@@ -20,19 +21,18 @@ def generate_index(
     if len(constructors) != 2:
         raise ValueError(
             f'Exactly two of `start`, `end`, `length` must be specified, but got {constructors}. '
-            'For generating an index with `end` and `length` consider setting `start` to None.'
+            'For generating an index with `end` and `length`, please consider setting `start` to None.'
         )
     if end is not None and start is not None and type(start) != type(end):
         raise ValueError(
             f'`start` and `end` must be of the same type, but got {type(start)} and {type(end)}.'
         )
-    if isinstance(start, pd.Timestamp) or isinstance(end, pd.Timestamp):
+    if isinstance(start, datetime.datetime) or isinstance(end, datetime.datetime):
         index = pd.date_range(
             start=start,
             end=end,
             periods=length,
-            freq='D' if freq is None else freq,
-            name='timestamp',
+            freq='s' if freq is None else freq,
         )
     else:
         freq = 1 if freq is None else int(freq)
@@ -44,7 +44,6 @@ def generate_index(
             start=start if start is not None else end - freq * (length - 1),
             stop=end + freq if end is not None else start + freq * length,
             step=freq,
-            name='timestamp',
         )
     return index
 

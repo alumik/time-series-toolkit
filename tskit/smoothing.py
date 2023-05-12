@@ -32,12 +32,12 @@ def moving_average(
     """
     values = pd.Series(ts.values).rolling(window=window, min_periods=0).mean().to_numpy()
     if inplace:
-        ts.values = values
+        ts.assign(values)
         return ts
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=values,
-        name=f'{ts.name}_ma({window})',
+        name=f'{ts.name}_ma({window})' if name is None else name,
     )
 
 
@@ -69,12 +69,12 @@ def exponential_weighted_moving_average(
     """
     values = pd.Series(ts.values).ewm(alpha=alpha).mean().to_numpy()
     if inplace:
-        ts.values = values
+        ts.assign(values)
         return ts
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=values,
-        name=f'{ts.name}_ewma({alpha})',
+        name=f'{ts.name}_ewma({alpha})' if name is None else name,
     )
 
 
@@ -106,12 +106,12 @@ def median(
     """
     values = scipy.signal.medfilt(ts.values, window)
     if inplace:
-        ts.values = values
+        ts.assign(values)
         return ts
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=values,
-        name=f'{ts.name}_med({window})',
+        name=f'{ts.name}_med({window})' if name is None else name,
     )
 
 
@@ -146,12 +146,12 @@ def savitzky_golay(
     """
     values = scipy.signal.savgol_filter(ts.values, window, order)
     if inplace:
-        ts.values = values
+        ts.assign(values)
         return ts
     return tskit.TimeSeries(
         index=ts.index.copy(),
         values=values,
-        name=f'{ts.name}_sg({window},{order})',
+        name=f'{ts.name}_sg({window},{order})' if name is None else name,
     )
 
 
