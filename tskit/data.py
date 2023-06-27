@@ -312,7 +312,8 @@ class TimeSeries:
             The index to set the values at.
             If None, the current index will be used.
         """
-        index = index or self.index
+        if index is None:
+            index = self.index
         if len(index) != len(values):
             raise ValueError('`index` and `values` must be of equal length.')
 

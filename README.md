@@ -1,6 +1,6 @@
 # tskit - Time Series Toolkit
 
-![version-0.0.9](https://img.shields.io/badge/version-0.0.9-blue)
+![version-0.0.10](https://img.shields.io/badge/version-0.0.10-blue)
 ![python->=3.11](https://img.shields.io/badge/python->=3.11-blue?logo=python&logoColor=white)
 ![license-MIT](https://img.shields.io/badge/license-MIT-green)
 
